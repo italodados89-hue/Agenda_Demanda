@@ -108,6 +108,47 @@ label.field>span{display:block;font-size:12px;color:var(--text-secondary);margin
 .auth-tabs{display:flex;gap:6px;background:rgba(255,255,255,0.04);padding:5px;border-radius:12px;margin-bottom:22px}
 .auth-tabs button{flex:1;background:transparent;border:none;color:var(--text-secondary);padding:9px;border-radius:8px;cursor:pointer;font-weight:600;font-size:13.5px;transition:.18s}
 .auth-tabs button.active{background:rgba(91,140,255,0.18);color:#fff}
+.auth-pane{display:none}
+.auth-pane.active{display:block}
+/* Sexo (radios) */
+.sexo-group{display:flex;gap:8px}
+.sexo-opt{flex:1}
+.sexo-opt input{position:absolute;opacity:0;pointer-events:none}
+.sexo-opt span{display:block;text-align:center;padding:10px 6px;border:1px solid var(--glass-border);
+  border-radius:var(--radius-sm);font-size:12.5px;color:var(--text-secondary);cursor:pointer;transition:.18s;font-weight:600}
+.sexo-opt input:checked+span{border-color:var(--accent);background:rgba(91,140,255,.16);color:#fff}
+/* Indicador de senha igual */
+.pass-hint{font-size:11.5px;margin-top:-8px;margin-bottom:12px;min-height:15px;font-weight:600}
+.pass-hint.ok{color:var(--success)}
+.pass-hint.bad{color:var(--danger)}
+/* Banner admin */
+.admin-note{font-size:11.5px;color:var(--text-muted);background:rgba(255,255,255,.04);
+  border:1px solid var(--glass-border);border-radius:10px;padding:9px 11px;margin-bottom:16px;line-height:1.45}
+/* Lista de aprovações */
+.appr-list{display:flex;flex-direction:column;gap:9px;max-height:46vh;overflow-y:auto;margin-bottom:6px}
+.appr-item{display:flex;align-items:center;gap:10px;padding:9px 11px;border:1px solid var(--glass-border);
+  border-radius:12px;background:rgba(255,255,255,.03)}
+.appr-item .ava{width:34px;height:34px;border-radius:50%;flex-shrink:0;object-fit:cover;
+  background:linear-gradient(135deg,var(--accent),var(--accent-2));display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:#fff}
+.appr-item .info{flex:1;min-width:0}
+.appr-item .info b{display:block;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.appr-item .info small{font-size:11px;color:var(--text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+.appr-badge{font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px}
+.appr-badge.pend{background:rgba(245,165,36,.18);color:#ffce80}
+.appr-badge.ok{background:rgba(34,199,154,.18);color:#7fe6c5}
+.appr-badge.adm{background:rgba(155,107,255,.2);color:#c9b3ff}
+/* Avatar topbar + perfil */
+.avatar-btn{width:34px;height:34px;border-radius:50%;border:1px solid var(--glass-border);overflow:hidden;
+  cursor:pointer;flex-shrink:0;background:linear-gradient(135deg,var(--accent),var(--accent-2));
+  display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:#fff;padding:0}
+.avatar-btn img{width:100%;height:100%;object-fit:cover;display:block}
+.profile-ava-wrap{display:flex;flex-direction:column;align-items:center;gap:12px;margin-bottom:18px}
+.profile-ava{width:110px;height:110px;border-radius:50%;overflow:hidden;border:2px solid var(--glass-border);
+  background:linear-gradient(135deg,var(--accent),var(--accent-2));display:flex;align-items:center;justify-content:center;
+  font-weight:800;font-size:38px;color:#fff;position:relative}
+.profile-ava img{width:100%;height:100%;object-fit:cover}
+.profile-ava .cam{position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.55);font-size:10px;
+  text-align:center;padding:4px;color:#fff;font-weight:600}
 
 /* ===================== APP LAYOUT ===================== */
 #app{display:none;min-height:100vh;flex-direction:column}
@@ -275,16 +316,76 @@ label.field>span{display:block;font-size:12px;color:var(--text-secondary);margin
     <div class="auth-tabs">
       <button id="tab-login" class="active" onclick="switchAuth('login')">Entrar</button>
       <button id="tab-signup" onclick="switchAuth('signup')">Criar conta</button>
+      <button id="tab-admin" onclick="switchAuth('admin')">Admin</button>
     </div>
-    <form id="auth-form" onsubmit="return false">
-      <label class="field"><span>E-mail</span>
-        <input class="input" type="email" id="auth-email" placeholder="voce@email.com" autocomplete="email" required>
-      </label>
-      <label class="field"><span>Senha</span>
-        <input class="input" type="password" id="auth-pass" placeholder="••••••••" autocomplete="current-password" required>
-      </label>
-      <button class="btn btn-primary" id="auth-btn" style="width:100%;margin-top:6px" onclick="doAuth()">Entrar</button>
-    </form>
+
+    <!-- ENTRAR -->
+    <div class="auth-pane active" id="pane-login">
+      <form onsubmit="return false">
+        <label class="field"><span>E-mail</span>
+          <input class="input" type="email" id="login-email" placeholder="voce@email.com" autocomplete="email">
+        </label>
+        <label class="field"><span>Senha</span>
+          <input class="input" type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password">
+        </label>
+        <button class="btn btn-primary" id="login-btn" style="width:100%;margin-top:6px" onclick="doLogin()">Entrar</button>
+      </form>
+    </div>
+
+    <!-- CRIAR CONTA -->
+    <div class="auth-pane" id="pane-signup">
+      <form onsubmit="return false">
+        <label class="field"><span>Nome *</span>
+          <input class="input" id="su-nome" placeholder="Seu nome completo" autocomplete="name">
+        </label>
+        <label class="field"><span>E-mail *</span>
+          <input class="input" type="email" id="su-email" placeholder="voce@email.com" autocomplete="email">
+        </label>
+        <label class="field"><span>Sexo</span>
+          <div class="sexo-group">
+            <label class="sexo-opt"><input type="radio" name="su-sexo" value="Masculino"><span>Masculino</span></label>
+            <label class="sexo-opt"><input type="radio" name="su-sexo" value="Feminino"><span>Feminino</span></label>
+            <label class="sexo-opt"><input type="radio" name="su-sexo" value="Não informar" checked><span>Não informar</span></label>
+          </div>
+        </label>
+        <label class="field"><span>Senha *</span>
+          <input class="input" type="password" id="su-pass" placeholder="Mínimo 6 caracteres" autocomplete="new-password" oninput="checarSenhas()">
+        </label>
+        <label class="field" style="margin-bottom:4px"><span>Confirmar senha *</span>
+          <input class="input" type="password" id="su-pass2" placeholder="Repita a senha" autocomplete="new-password" oninput="checarSenhas()">
+        </label>
+        <div class="pass-hint" id="su-hint"></div>
+        <button class="btn btn-primary" id="su-btn" style="width:100%" onclick="doSignup()">Criar conta</button>
+      </form>
+    </div>
+
+    <!-- ADMIN -->
+    <div class="auth-pane" id="pane-admin">
+      <div class="admin-note">🔐 Área restrita. Entre com o e-mail e a senha de administrador para liberar o acesso de novos usuários ao portal.</div>
+      <div id="admin-login-box">
+        <form onsubmit="return false">
+          <label class="field"><span>E-mail do admin</span>
+            <input class="input" type="email" id="adm-email" placeholder="italo.dados89@gmail.com" autocomplete="email">
+          </label>
+          <label class="field"><span>Senha</span>
+            <input class="input" type="password" id="adm-pass" placeholder="••••••••" autocomplete="current-password">
+          </label>
+          <button class="btn btn-primary" id="adm-btn" style="width:100%;margin-top:6px" onclick="doAdminLogin()">Entrar no painel</button>
+        </form>
+      </div>
+      <div id="admin-panel-box" class="hidden">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+          <b style="font-size:14px">Usuários</b>
+          <button class="icon-btn" onclick="carregarAprovacoes()" title="Atualizar">⟳</button>
+        </div>
+        <div class="appr-list" id="appr-list"></div>
+        <div class="modal-foot" style="margin-top:14px">
+          <button class="btn btn-ghost btn-sm" onclick="adminSair()">Sair do painel</button>
+          <button class="btn btn-primary btn-sm" onclick="adminEntrarApp()">Acessar plataforma</button>
+        </div>
+      </div>
+    </div>
+
     <p id="auth-msg" style="font-size:12.5px;color:var(--text-secondary);text-align:center;margin-top:14px;min-height:18px"></p>
   </div>
 </div>
@@ -298,6 +399,7 @@ label.field>span{display:block;font-size:12px;color:var(--text-secondary);margin
     <button class="icon-btn" onclick="carregarTudo()" title="Atualizar">⟳</button>
     <button class="icon-btn" onclick="openConfig()" title="Configurações">⚙</button>
     <div class="user-chip"><span class="dot"></span><span id="user-email">—</span></div>
+    <button class="avatar-btn" id="topbar-avatar" onclick="openProfile()" title="Meu perfil">👤</button>
     <button class="icon-btn" onclick="logout()" title="Sair">⎋</button>
   </header>
 
@@ -386,6 +488,35 @@ label.field>span{display:block;font-size:12px;color:var(--text-secondary);margin
   </div>
 </div>
 
+<!-- ===================== MODAL PERFIL ===================== -->
+<div class="overlay" id="modal-profile">
+  <div class="modal glass" style="max-width:440px">
+    <h2>Meu perfil</h2>
+    <div class="m-sub">Adicione uma foto e mantenha seus dados atualizados.</div>
+    <div class="profile-ava-wrap">
+      <div class="profile-ava" id="profile-ava" onclick="document.getElementById('avatar-file').click()" title="Trocar foto">
+        <span id="profile-ava-fallback">👤</span>
+        <div class="cam">📷 Trocar foto</div>
+      </div>
+      <input type="file" id="avatar-file" accept="image/*" class="hidden" onchange="enviarAvatar(event)">
+      <div id="avatar-status" style="font-size:11.5px;color:var(--text-secondary);min-height:15px"></div>
+    </div>
+    <label class="field"><span>Nome</span><input class="input" id="pf-nome" placeholder="Seu nome"></label>
+    <label class="field"><span>E-mail</span><input class="input" id="pf-email" disabled style="opacity:.6"></label>
+    <label class="field"><span>Sexo</span>
+      <div class="sexo-group">
+        <label class="sexo-opt"><input type="radio" name="pf-sexo" value="Masculino"><span>Masculino</span></label>
+        <label class="sexo-opt"><input type="radio" name="pf-sexo" value="Feminino"><span>Feminino</span></label>
+        <label class="sexo-opt"><input type="radio" name="pf-sexo" value="Não informar"><span>Não informar</span></label>
+      </div>
+    </label>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeProfile()">Fechar</button>
+      <button class="btn btn-primary" id="pf-save" onclick="salvarPerfil()">Salvar</button>
+    </div>
+  </div>
+</div>
+
 <!-- ===================== MODAL CONFIG ===================== -->
 <div class="overlay" id="modal-config">
   <div class="modal glass">
@@ -428,9 +559,11 @@ const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
    ESTADO GLOBAL
    ============================================================ */
 let USER = null;
+let PROFILE = null;         // perfil do usuário (nome, sexo, foto, aprovação)
 let DEMANDAS = [];          // todas as demandas do usuário
 let CONFIG = null;          // listas configuráveis do usuário
 let authMode = 'login';
+const ADMIN_EMAIL = 'italo.dados89@gmail.com';
 
 // Listas padrão (usadas na 1ª vez / mescladas com as do usuário)
 const DEFAULTS = {
@@ -477,58 +610,266 @@ function estaAtrasada(d){
 /* ============================================================
    AUTENTICAÇÃO
    ============================================================ */
+// Alterna entre as abas Entrar / Criar conta / Admin
 function switchAuth(mode){
   authMode=mode;
-  document.getElementById('tab-login').classList.toggle('active',mode==='login');
-  document.getElementById('tab-signup').classList.toggle('active',mode==='signup');
-  document.getElementById('auth-btn').textContent = mode==='login'?'Entrar':'Criar conta';
-  document.getElementById('auth-pass').setAttribute('autocomplete', mode==='login'?'current-password':'new-password');
+  ['login','signup','admin'].forEach(m=>{
+    document.getElementById('tab-'+m).classList.toggle('active',m===mode);
+    document.getElementById('pane-'+m).classList.toggle('active',m===mode);
+  });
   document.getElementById('auth-msg').textContent='';
+  document.getElementById('auth-msg').style.color='var(--text-secondary)';
 }
-async function doAuth(){
-  const email=document.getElementById('auth-email').value.trim();
-  const pass=document.getElementById('auth-pass').value;
-  const msg=document.getElementById('auth-msg');
-  if(!email||!pass){msg.textContent='Preencha e-mail e senha.';return;}
-  if(pass.length<6){msg.textContent='A senha precisa ter ao menos 6 caracteres.';return;}
-  const btn=document.getElementById('auth-btn');btn.disabled=true;btn.textContent='Aguarde...';
-  try{
-    if(authMode==='signup'){
-      const{data,error}=await sb.auth.signUp({email,password:pass});
-      if(error)throw error;
-      if(data.session){await iniciarApp(data.session.user);}
-      else{msg.style.color='var(--success)';msg.textContent='Conta criada! Verifique seu e-mail se a confirmação estiver ativa, depois faça login.';switchAuth('login');}
-    }else{
-      const{data,error}=await sb.auth.signInWithPassword({email,password:pass});
-      if(error)throw error;
-      await iniciarApp(data.user);
-    }
-  }catch(err){
-    msg.style.color='var(--danger)';
-    msg.textContent = traduzErro(err.message);
-  }finally{btn.disabled=false;btn.textContent=authMode==='login'?'Entrar':'Criar conta';}
+function authMsg(txt,ok=false){
+  const m=document.getElementById('auth-msg');
+  m.textContent=txt; m.style.color=ok?'var(--success)':'var(--danger)';
 }
 function traduzErro(m){
   if(!m)return 'Erro inesperado.';
   if(/Invalid login/i.test(m))return 'E-mail ou senha incorretos.';
-  if(/already registered/i.test(m))return 'Este e-mail já tem conta. Faça login.';
-  if(/Email not confirmed/i.test(m))return 'Confirme seu e-mail antes de entrar.';
+  if(/already registered|already been registered/i.test(m))return 'Este e-mail já tem conta. Faça login.';
+  if(/Email not confirmed/i.test(m))return 'E-mail ainda não confirmado. Desligue "Confirm email" no Supabase ou confirme pelo link enviado.';
+  if(/rate limit/i.test(m))return 'Muitas tentativas. Aguarde alguns segundos.';
   return m;
 }
+
+/* ---------- CADASTRO ---------- */
+function checarSenhas(){
+  const p1=document.getElementById('su-pass').value;
+  const p2=document.getElementById('su-pass2').value;
+  const h=document.getElementById('su-hint');
+  if(!p2){h.textContent='';h.className='pass-hint';return true;}
+  if(p1===p2){h.textContent='✓ As senhas coincidem';h.className='pass-hint ok';return true;}
+  h.textContent='✗ As senhas não coincidem';h.className='pass-hint bad';return false;
+}
+async function doSignup(){
+  const nome=document.getElementById('su-nome').value.trim();
+  const email=document.getElementById('su-email').value.trim();
+  const sexo=(document.querySelector('input[name="su-sexo"]:checked')||{}).value||'Não informar';
+  const p1=document.getElementById('su-pass').value;
+  const p2=document.getElementById('su-pass2').value;
+  if(!nome){authMsg('Informe seu nome.');return;}
+  if(!email){authMsg('Informe seu e-mail.');return;}
+  if(p1.length<6){authMsg('A senha precisa ter ao menos 6 caracteres.');return;}
+  if(p1!==p2){authMsg('As senhas não coincidem.');return;}
+  const btn=document.getElementById('su-btn');btn.disabled=true;btn.textContent='Criando...';
+  try{
+    const{data,error}=await sb.auth.signUp({
+      email,password:p1,
+      options:{data:{nome,sexo}}   // vira raw_user_meta_data -> trigger cria o profile
+    });
+    if(error)throw error;
+    const ehAdmin = email.toLowerCase()===ADMIN_EMAIL;
+    // Se houver sessão imediata (confirmação de e-mail desligada):
+    if(data.session){
+      if(ehAdmin){ await iniciarApp(data.session.user); return; }
+      // usuário comum: sai e aguarda aprovação
+      await sb.auth.signOut();
+      authMsg('Conta criada! Aguarde a liberação do administrador para acessar.',true);
+      switchAuth('login');
+    }else{
+      authMsg('Conta criada! Confirme seu e-mail (se exigido) e aguarde a liberação do administrador.',true);
+      switchAuth('login');
+    }
+  }catch(err){ authMsg(traduzErro(err.message)); }
+  finally{ btn.disabled=false; btn.textContent='Criar conta'; }
+}
+
+/* ---------- LOGIN ---------- */
+async function doLogin(){
+  const email=document.getElementById('login-email').value.trim();
+  const pass=document.getElementById('login-pass').value;
+  if(!email||!pass){authMsg('Preencha e-mail e senha.');return;}
+  const btn=document.getElementById('login-btn');btn.disabled=true;btn.textContent='Entrando...';
+  try{
+    const{data,error}=await sb.auth.signInWithPassword({email,password:pass});
+    if(error)throw error;
+    await iniciarApp(data.user);
+  }catch(err){ authMsg(traduzErro(err.message)); }
+  finally{ btn.disabled=false; btn.textContent='Entrar'; }
+}
+
+// Carrega o profile e devolve. Cria um fallback se a linha não existir.
+async function carregarPerfil(user){
+  try{
+    const{data,error}=await sb.from('profiles').select('*').eq('id',user.id).maybeSingle();
+    if(error)throw error;
+    if(data) return data;
+  }catch(err){ console.warn('Perfil indisponível:',err.message); }
+  // fallback (ex.: tabela recém-criada) — admin sempre aprovado
+  const ehAdmin=user.email.toLowerCase()===ADMIN_EMAIL;
+  return {id:user.id,email:user.email,nome:'',sexo:'Não informar',avatar_url:null,is_approved:ehAdmin,is_admin:ehAdmin};
+}
+
 async function logout(){
   await sb.auth.signOut();
-  USER=null;DEMANDAS=[];CONFIG=null;
+  USER=null;PROFILE=null;DEMANDAS=[];CONFIG=null;
   document.getElementById('app').style.display='none';
   document.getElementById('login-screen').style.display='flex';
-  document.getElementById('auth-pass').value='';
+  document.getElementById('login-pass').value='';
+  switchAuth('login');
 }
+
+// Entra no app SOMENTE se aprovado (admin é sempre aprovado).
 async function iniciarApp(user){
   USER=user;
+  PROFILE=await carregarPerfil(user);
+  const ehAdmin = user.email.toLowerCase()===ADMIN_EMAIL || PROFILE.is_admin;
+  if(!PROFILE.is_approved && !ehAdmin){
+    await sb.auth.signOut();
+    USER=null;PROFILE=null;
+    authMsg('Sua conta ainda não foi liberada pelo administrador. Tente novamente mais tarde.');
+    switchAuth('login');
+    return;
+  }
   document.getElementById('login-screen').style.display='none';
   document.getElementById('app').style.display='flex';
-  document.getElementById('user-email').textContent=user.email;
+  document.getElementById('user-email').textContent=PROFILE.nome||user.email;
+  pintarAvatarTopbar();
   await carregarConfig();
   await carregarTudo();
+}
+
+/* ============================================================
+   PAINEL ADMIN (aprovação de usuários na tela de login)
+   ============================================================ */
+async function doAdminLogin(){
+  const email=document.getElementById('adm-email').value.trim();
+  const pass=document.getElementById('adm-pass').value;
+  if(!email||!pass){authMsg('Preencha e-mail e senha do admin.');return;}
+  if(email.toLowerCase()!==ADMIN_EMAIL){authMsg('Este e-mail não é administrador.');return;}
+  const btn=document.getElementById('adm-btn');btn.disabled=true;btn.textContent='Entrando...';
+  try{
+    const{data,error}=await sb.auth.signInWithPassword({email,password:pass});
+    if(error)throw error;
+    USER=data.user;
+    PROFILE=await carregarPerfil(data.user);
+    document.getElementById('admin-login-box').classList.add('hidden');
+    document.getElementById('admin-panel-box').classList.remove('hidden');
+    document.getElementById('auth-msg').textContent='';
+    await carregarAprovacoes();
+  }catch(err){ authMsg(traduzErro(err.message)); }
+  finally{ btn.disabled=false; btn.textContent='Entrar no painel'; }
+}
+async function carregarAprovacoes(){
+  const box=document.getElementById('appr-list');
+  box.innerHTML='<div style="text-align:center;color:var(--text-muted);font-size:12px;padding:14px">Carregando...</div>';
+  try{
+    const{data,error}=await sb.from('profiles').select('*').order('created_at',{ascending:true});
+    if(error)throw error;
+    if(!data||!data.length){box.innerHTML='<div style="text-align:center;color:var(--text-muted);font-size:12px;padding:14px">Nenhum usuário ainda.</div>';return;}
+    box.innerHTML=data.map(p=>{
+      const inicial=(p.nome||p.email||'?').trim().charAt(0).toUpperCase();
+      const ava=p.avatar_url?`<img class="ava" src="${esc(p.avatar_url)}">`:`<div class="ava">${esc(inicial)}</div>`;
+      let badge,acao;
+      if(p.is_admin){
+        badge='<span class="appr-badge adm">ADMIN</span>'; acao='';
+      }else if(p.is_approved){
+        badge='<span class="appr-badge ok">Liberado</span>';
+        acao=`<button class="btn btn-danger btn-sm" onclick="setAprovacao('${p.id}',false)">Revogar</button>`;
+      }else{
+        badge='<span class="appr-badge pend">Pendente</span>';
+        acao=`<button class="btn btn-primary btn-sm" onclick="setAprovacao('${p.id}',true)">Liberar</button>`;
+      }
+      return `<div class="appr-item">${ava}
+        <div class="info"><b>${esc(p.nome||'(sem nome)')}</b><small>${esc(p.email||'')}</small></div>
+        ${badge}${acao}</div>`;
+    }).join('');
+  }catch(err){
+    box.innerHTML=`<div style="text-align:center;color:var(--danger);font-size:12px;padding:14px">Erro: ${esc(err.message)}</div>`;
+  }
+}
+async function setAprovacao(id,aprovar){
+  try{
+    const{error}=await sb.from('profiles').update({is_approved:aprovar}).eq('id',id);
+    if(error)throw error;
+    showToast(aprovar?'Usuário liberado ✔':'Acesso revogado','success');
+    await carregarAprovacoes();
+  }catch(err){ showToast('Erro: '+err.message,'error',5000); }
+}
+async function adminSair(){
+  await sb.auth.signOut();
+  USER=null;PROFILE=null;
+  document.getElementById('admin-panel-box').classList.add('hidden');
+  document.getElementById('admin-login-box').classList.remove('hidden');
+  document.getElementById('adm-pass').value='';
+  switchAuth('login');
+}
+async function adminEntrarApp(){
+  if(USER){ await iniciarApp(USER); }
+}
+
+/* ============================================================
+   PERFIL DO USUÁRIO (nome, sexo, foto)
+   ============================================================ */
+function iniciaisDe(txt){return (txt||'?').trim().charAt(0).toUpperCase()||'👤';}
+function pintarAvatarTopbar(){
+  const btn=document.getElementById('topbar-avatar');
+  if(PROFILE&&PROFILE.avatar_url){
+    btn.innerHTML=`<img src="${esc(PROFILE.avatar_url)}" alt="">`;
+  }else{
+    btn.textContent=iniciaisDe(PROFILE?(PROFILE.nome||PROFILE.email):'');
+  }
+}
+function openProfile(){
+  if(!PROFILE)return;
+  document.getElementById('pf-nome').value=PROFILE.nome||'';
+  document.getElementById('pf-email').value=PROFILE.email||USER.email||'';
+  const sx=PROFILE.sexo||'Não informar';
+  const r=document.querySelector(`input[name="pf-sexo"][value="${sx}"]`);
+  if(r)r.checked=true;
+  document.getElementById('avatar-status').textContent='';
+  pintarAvatarPerfil();
+  document.getElementById('modal-profile').classList.add('show');
+}
+function closeProfile(){document.getElementById('modal-profile').classList.remove('show');}
+function pintarAvatarPerfil(){
+  const box=document.getElementById('profile-ava');
+  const old=box.querySelector('img'); if(old)old.remove();
+  const fb=document.getElementById('profile-ava-fallback');
+  if(PROFILE&&PROFILE.avatar_url){
+    fb.style.display='none';
+    const img=document.createElement('img');img.src=PROFILE.avatar_url;
+    box.insertBefore(img,box.firstChild);
+  }else{
+    fb.style.display='';fb.textContent=iniciaisDe(PROFILE?(PROFILE.nome||PROFILE.email):'');
+  }
+}
+async function enviarAvatar(ev){
+  const file=ev.target.files&&ev.target.files[0];
+  if(!file)return;
+  if(!file.type.startsWith('image/')){showToast('Selecione uma imagem','error');return;}
+  if(file.size>5*1024*1024){showToast('Imagem muito grande (máx. 5MB)','error');return;}
+  const st=document.getElementById('avatar-status');st.textContent='Enviando foto...';
+  try{
+    const ext=(file.name.split('.').pop()||'png').toLowerCase();
+    const path=`${USER.id}/avatar_${Date.now()}.${ext}`;
+    const{error}=await sb.storage.from('avatars').upload(path,file,{upsert:true,cacheControl:'3600'});
+    if(error)throw error;
+    const{data:{publicUrl}}=sb.storage.from('avatars').getPublicUrl(path);
+    const{error:e2}=await sb.from('profiles').update({avatar_url:publicUrl}).eq('id',USER.id);
+    if(e2)throw e2;
+    PROFILE.avatar_url=publicUrl;
+    pintarAvatarPerfil();pintarAvatarTopbar();
+    st.textContent='Foto atualizada ✔';
+    showToast('Foto de perfil atualizada','success');
+  }catch(err){ st.textContent=''; showToast('Erro ao enviar foto: '+err.message,'error',5000); }
+  finally{ ev.target.value=''; }
+}
+async function salvarPerfil(){
+  const nome=document.getElementById('pf-nome').value.trim();
+  const sexo=(document.querySelector('input[name="pf-sexo"]:checked')||{}).value||'Não informar';
+  const btn=document.getElementById('pf-save');btn.disabled=true;btn.textContent='Salvando...';
+  try{
+    const{error}=await sb.from('profiles').update({nome,sexo}).eq('id',USER.id);
+    if(error)throw error;
+    PROFILE.nome=nome;PROFILE.sexo=sexo;
+    document.getElementById('user-email').textContent=nome||USER.email;
+    pintarAvatarTopbar();
+    showToast('Perfil salvo','success');
+    closeProfile();
+  }catch(err){ showToast('Erro ao salvar perfil: '+err.message,'error',5000); }
+  finally{ btn.disabled=false; btn.textContent='Salvar'; }
 }
 
 /* ============================================================
