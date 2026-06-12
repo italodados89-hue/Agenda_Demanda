@@ -26,23 +26,24 @@
 <style>
 /* ===================== DESIGN TOKENS ===================== */
 :root{
-  --bg-primary:#0b0d14;
-  --bg-secondary:#10131d;
-  --bg-card:rgba(255,255,255,0.04);
-  --bg-card-hover:rgba(255,255,255,0.07);
-  --glass-bg:rgba(255,255,255,0.05);
-  --glass-border:rgba(255,255,255,0.10);
-  --glass-shadow:0 8px 32px rgba(0,0,0,0.45);
-  --glass-blur:blur(18px);
+  --bg-primary:#0c0f18;
+  --bg-secondary:#141826;
+  /* Cartões mais claros e legíveis (itens 11/14) */
+  --bg-card:rgba(255,255,255,0.09);
+  --bg-card-hover:rgba(255,255,255,0.14);
+  --glass-bg:rgba(255,255,255,0.07);
+  --glass-border:rgba(255,255,255,0.16);
+  --glass-shadow:0 10px 36px rgba(0,0,0,0.40);
+  --glass-blur:blur(22px) saturate(140%);
   --accent:#5b8cff;
   --accent-2:#9b6bff;
   --accent-glow:rgba(91,140,255,0.30);
-  --text-primary:#eef1f7;
-  --text-secondary:#9aa3b8;
-  --text-muted:#5b6478;
-  --success:#22c79a;
-  --warning:#f5a524;
-  --danger:#ff5d6c;
+  --text-primary:#f3f5fb;
+  --text-secondary:#aab2c6;
+  --text-muted:#727b92;
+  --success:#2ad6a6;
+  --warning:#f7b13c;
+  --danger:#ff6173;
   --info:#4aa8ff;
   --radius:16px;
   --radius-sm:10px;
@@ -80,6 +81,13 @@ button{font-family:inherit}
 .input::placeholder{color:var(--text-muted)}
 .input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-glow)}
 select.input{appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='%239aa3b8' viewBox='0 0 16 16'><path d='M4 6l4 4 4-4'/></svg>");background-repeat:no-repeat;background-position:right 12px center;padding-right:34px}
+/* Item 1 — opções dos selects com cor de contraste (antes eram branco no branco) */
+select.input option,select.input optgroup{background:#1b2030;color:var(--text-primary);font-size:14px}
+select.input option:checked,select.input option:hover{background:#2b3650;color:#fff}
+/* Item 2 — campo de data: ícone de calendário visível + cursor de clique */
+input[type=date].input{position:relative;cursor:pointer}
+input[type=date].input::-webkit-calendar-picker-indicator{filter:invert(0.85);opacity:.85;cursor:pointer;padding:2px;border-radius:4px;transition:.18s}
+input[type=date].input::-webkit-calendar-picker-indicator:hover{opacity:1;background:rgba(91,140,255,.25)}
 textarea.input{resize:vertical;min-height:74px}
 label.field{display:block;margin-bottom:14px}
 label.field>span{display:block;font-size:12px;color:var(--text-secondary);margin-bottom:6px;font-weight:600}
@@ -167,14 +175,14 @@ label.field>span{display:block;font-size:12px;color:var(--text-secondary);margin
 .content{padding:18px;max-width:1500px;margin:0 auto;width:100%}
 
 /* ===================== KPIs ===================== */
-.kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:18px}
-.kpi{padding:15px 16px;position:relative;overflow:hidden}
-.kpi .k-label{font-size:11.5px;color:var(--text-secondary);font-weight:600;margin-bottom:8px;display:flex;align-items:center;gap:6px}
-.kpi .k-value{font-family:'Sora',sans-serif;font-size:28px;font-weight:700;line-height:1}
+.kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:16px}
+.kpi{padding:10px 13px;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center}
+.kpi .k-label{font-size:10.5px;color:var(--text-secondary);font-weight:600;margin-bottom:4px;display:flex;align-items:center;gap:5px;text-transform:uppercase;letter-spacing:.4px}
+.kpi .k-value{font-family:'Sora',sans-serif;font-size:21px;font-weight:700;line-height:1}
 .kpi.k-late .k-value{color:var(--danger)}
 .kpi.k-today .k-value{color:var(--warning)}
 .kpi.k-done .k-value{color:var(--success)}
-.kpi::after{content:"";position:absolute;right:-20px;top:-20px;width:70px;height:70px;border-radius:50%;background:var(--accent-glow);filter:blur(22px);opacity:.5}
+.kpi::after{content:"";position:absolute;right:-18px;top:-18px;width:56px;height:56px;border-radius:50%;background:var(--accent-glow);filter:blur(20px);opacity:.45}
 .kpi.k-late::after{background:rgba(255,93,108,.3)}
 .kpi.k-today::after{background:rgba(245,165,36,.3)}
 .kpi.k-done::after{background:rgba(34,199,154,.3)}
@@ -191,46 +199,83 @@ label.field>span{display:block;font-size:12px;color:var(--text-secondary);margin
 .chip-toggle{display:inline-flex;align-items:center;gap:7px}
 
 /* ===================== KANBAN ===================== */
-.board{display:flex;gap:14px;overflow-x:auto;padding-bottom:14px;align-items:flex-start}
-.column{flex:0 0 290px;display:flex;flex-direction:column;max-height:calc(100vh - 230px)}
-.col-head{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-radius:14px 14px 0 0;
-  border:1px solid var(--glass-border);border-bottom:none;background:rgba(255,255,255,0.04)}
+.board{display:flex;gap:14px;overflow-x:auto;padding-bottom:14px;align-items:flex-start;scroll-snap-type:x proximity}
+.column{flex:0 0 340px;display:flex;flex-direction:column;max-height:calc(100vh - 220px);scroll-snap-align:start}
+.col-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:11px 14px;border-radius:14px 14px 0 0;
+  border:1px solid var(--glass-border);border-bottom:none;background:rgba(255,255,255,0.05)}
 .col-head .c-title{font-family:'Sora',sans-serif;font-size:13.5px;font-weight:600;display:flex;align-items:center;gap:8px}
-.col-head .c-count{font-size:11.5px;color:var(--text-secondary);background:rgba(255,255,255,0.07);padding:2px 9px;border-radius:20px;font-weight:600}
+.col-head .c-right{display:flex;align-items:center;gap:6px}
+.col-head .c-count{font-size:11.5px;color:var(--text-secondary);background:rgba(255,255,255,0.09);padding:2px 9px;border-radius:20px;font-weight:600}
 .col-dot{width:9px;height:9px;border-radius:50%}
+/* Item 10 — alerta de vencimentos nos próximos 2 dias por coluna */
+.due-alert{display:inline-flex;align-items:center;gap:4px;font-size:10.5px;font-weight:700;
+  color:#ffd9a0;background:rgba(247,177,60,.16);border:1px solid rgba(247,177,60,.4);
+  padding:2px 8px;border-radius:20px;white-space:nowrap}
+.due-alert svg{width:11px;height:11px}
 .col-body{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:11px;
-  border:1px solid var(--glass-border);border-top:none;border-radius:0 0 14px 14px;background:rgba(255,255,255,0.015);min-height:90px}
+  border:1px solid var(--glass-border);border-top:none;border-radius:0 0 14px 14px;background:rgba(255,255,255,0.02);min-height:90px}
 .col-empty{color:var(--text-muted);font-size:12.5px;text-align:center;padding:24px 6px;border:1px dashed var(--glass-border);border-radius:12px}
 
 /* ===================== CARD ===================== */
-.card{padding:13px;border-radius:14px;background:var(--bg-card);border:1px solid var(--glass-border);
-  border-left:3px solid var(--text-muted);transition:.18s;cursor:default;position:relative}
-.card:hover{background:var(--bg-card-hover);transform:translateY(-2px)}
-.card.late{border-left-color:var(--danger);box-shadow:0 0 0 1px rgba(255,93,108,.35),0 6px 20px rgba(255,93,108,.12)}
+.card{padding:14px;border-radius:14px;background:var(--bg-card);border:1px solid var(--glass-border);
+  border-left:4px solid var(--text-muted);transition:.18s;cursor:default;position:relative;
+  box-shadow:0 4px 16px rgba(0,0,0,.22)}
+.card:hover{background:var(--bg-card-hover);transform:translateY(-2px);box-shadow:0 8px 26px rgba(0,0,0,.30)}
+.card.late{border-left-color:var(--danger);box-shadow:0 0 0 1px rgba(255,97,115,.4),0 6px 22px rgba(255,97,115,.16)}
 .card.prio-Crítica{border-left-color:var(--danger)}
 .card.prio-Alta{border-left-color:var(--warning)}
 .card.prio-Normal{border-left-color:var(--accent)}
 .card.prio-Baixa{border-left-color:var(--text-muted)}
-.card .c-top{display:flex;align-items:center;gap:6px;margin-bottom:8px;flex-wrap:wrap}
-.tag{font-size:10.5px;font-weight:700;padding:3px 8px;border-radius:6px;letter-spacing:.2px}
-.tag.tipo{background:rgba(91,140,255,.16);color:#9bb6ff}
-.tag.prio-Crítica{background:rgba(255,93,108,.18);color:#ff9aa4}
-.tag.prio-Alta{background:rgba(245,165,36,.18);color:#ffce80}
-.tag.prio-Normal{background:rgba(91,140,255,.16);color:#9bb6ff}
-.tag.prio-Baixa{background:rgba(255,255,255,.08);color:var(--text-secondary)}
-.late-badge{font-size:10px;font-weight:700;color:#fff;background:var(--danger);padding:3px 7px;border-radius:6px;margin-left:auto}
-.card .c-desc{font-size:13.5px;font-weight:600;line-height:1.35;margin-bottom:9px;color:var(--text-primary)}
-.card .c-meta{display:flex;flex-direction:column;gap:3px;font-size:11.5px;color:var(--text-secondary);margin-bottom:9px}
+.card.flagged{box-shadow:0 0 0 1px rgba(247,177,60,.45),0 6px 22px rgba(247,177,60,.12)}
+.card .c-top{display:flex;align-items:center;gap:6px;margin-bottom:9px;flex-wrap:wrap}
+.tag{font-size:10.5px;font-weight:700;padding:3px 9px;border-radius:6px;letter-spacing:.2px}
+.tag.tipo{background:rgba(91,140,255,.20);color:#bcd0ff}
+.tag.prio-Crítica{background:rgba(255,97,115,.22);color:#ffb0b9}
+.tag.prio-Alta{background:rgba(247,177,60,.22);color:#ffd79a}
+.tag.prio-Normal{background:rgba(91,140,255,.20);color:#bcd0ff}
+.tag.prio-Baixa{background:rgba(255,255,255,.12);color:var(--text-secondary)}
+.late-badge{font-size:10px;font-weight:700;color:#fff;background:var(--danger);padding:3px 8px;border-radius:6px}
+/* Item 9 — botão de bandeira (flag) */
+.flag-btn{margin-left:auto;background:transparent;border:none;cursor:pointer;color:var(--text-muted);
+  padding:3px;border-radius:6px;display:inline-flex;transition:.18s}
+.flag-btn:hover{color:var(--warning);background:rgba(247,177,60,.14)}
+.flag-btn.on{color:var(--warning)}
+.flag-btn svg{width:16px;height:16px}
+.card .c-desc{font-size:14px;font-weight:600;line-height:1.4;margin-bottom:10px;color:var(--text-primary)}
+.card .c-meta{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--text-secondary);margin-bottom:10px}
+.card .c-meta div{display:flex;align-items:center;gap:6px}
 .card .c-meta b{color:var(--text-primary);font-weight:600}
-.card .c-dates{display:flex;gap:10px;font-size:11px;color:var(--text-muted);margin-bottom:9px;flex-wrap:wrap}
-.card .c-dates .d-late{color:var(--danger);font-weight:700}
+.card .c-meta svg{width:13px;height:13px;color:var(--text-muted);flex-shrink:0}
+/* Item 12 — datas em destaque (chips) */
+.card .c-dates{display:flex;gap:7px;margin-bottom:10px;flex-wrap:wrap}
+.card .c-dates .date-chip{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;
+  color:var(--text-secondary);background:rgba(255,255,255,.07);border:1px solid var(--glass-border);
+  padding:4px 9px;border-radius:8px}
+.card .c-dates .date-chip svg{width:12px;height:12px;color:var(--text-muted)}
+.card .c-dates .date-chip.prazo{color:#bcd0ff;background:rgba(91,140,255,.16);border-color:rgba(91,140,255,.35)}
+.card .c-dates .date-chip.prazo svg{color:#9bb6ff}
+.card .c-dates .date-chip.d-late{color:#ffb0b9;background:rgba(255,97,115,.18);border-color:rgba(255,97,115,.45)}
+.card .c-dates .date-chip.d-late svg{color:#ff9aa4}
+.card .c-dates .date-chip.done{color:#a8eed7;background:rgba(42,214,166,.16);border-color:rgba(42,214,166,.4)}
+.card .c-dates .date-chip.done svg{color:#7fe6c5}
+.card .c-changed{font-size:10.5px;color:var(--text-muted);margin-bottom:9px;display:flex;align-items:center;gap:5px}
+.card .c-changed svg{width:11px;height:11px}
 .card .c-tags{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px}
-.card .c-tags .t{font-size:10px;color:var(--text-secondary);background:rgba(255,255,255,.06);padding:2px 7px;border-radius:20px}
-.progress{height:5px;background:rgba(255,255,255,.07);border-radius:5px;overflow:hidden;margin-bottom:11px}
-.progress>i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-2));border-radius:5px}
+.card .c-tags .t{font-size:10px;color:var(--text-secondary);background:rgba(255,255,255,.09);padding:2px 8px;border-radius:20px}
+.progress{height:6px;background:rgba(255,255,255,.10);border-radius:6px;overflow:hidden;margin-bottom:11px}
+.progress>i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-2));border-radius:6px}
+/* Item 4 — mover entre status com 1 clique */
+.c-move{display:flex;align-items:center;gap:6px;margin-bottom:9px}
+.move-btn{flex:1;background:rgba(255,255,255,.06);border:1px solid var(--glass-border);color:var(--text-secondary);
+  cursor:pointer;border-radius:8px;padding:6px;display:inline-flex;align-items:center;justify-content:center;gap:5px;
+  font-size:11px;font-weight:600;transition:.18s}
+.move-btn:hover:not(:disabled){background:rgba(91,140,255,.18);color:#fff;border-color:rgba(91,140,255,.4)}
+.move-btn:disabled{opacity:.3;cursor:not-allowed}
+.move-btn svg{width:13px;height:13px}
 .card .c-actions{display:flex;gap:6px;flex-wrap:wrap}
-.card .c-actions .icon-btn{background:rgba(255,255,255,.05);font-size:11px;padding:6px 9px;gap:5px;color:var(--text-secondary)}
-.card .c-actions .icon-btn:hover{color:#fff}
+.card .c-actions .icon-btn{background:rgba(255,255,255,.07);font-size:11px;padding:6px 9px;gap:5px;color:var(--text-secondary)}
+.card .c-actions .icon-btn svg{width:13px;height:13px}
+.card .c-actions .icon-btn:hover{color:#fff;background:rgba(255,255,255,.13)}
 .card .c-actions .ok:hover{color:var(--success)}
 .card .c-actions .arch:hover{color:var(--warning)}
 .card .c-actions .del:hover{color:var(--danger)}
@@ -395,22 +440,28 @@ label.field>span{display:block;font-size:12px;color:var(--text-secondary);margin
   <header class="topbar">
     <div class="brand">Pipeline de Demandas<small>Sistema pessoal · Ítalo</small></div>
     <div class="spacer"></div>
-    <button class="btn btn-primary btn-sm" onclick="openModal()" title="Nova demanda">＋ <span class="new-txt">Nova Demanda</span></button>
-    <button class="icon-btn" onclick="carregarTudo()" title="Atualizar">⟳</button>
-    <button class="icon-btn" onclick="openConfig()" title="Configurações">⚙</button>
+    <button class="btn btn-primary btn-sm" onclick="openModal()" title="Nova demanda">
+      <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+      <span class="new-txt">Nova Demanda</span></button>
+    <button class="icon-btn" onclick="carregarTudo()" title="Atualizar">
+      <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 4v4h-4"/></svg></button>
+    <button class="icon-btn" onclick="openConfig()" title="Configurações">
+      <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
     <div class="user-chip"><span class="dot"></span><span id="user-email">—</span></div>
-    <button class="avatar-btn" id="topbar-avatar" onclick="openProfile()" title="Meu perfil">👤</button>
-    <button class="icon-btn" onclick="logout()" title="Sair">⎋</button>
+    <button class="avatar-btn" id="topbar-avatar" onclick="openProfile()" title="Meu perfil">
+      <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></button>
+    <button class="icon-btn" onclick="logout()" title="Sair">
+      <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5M21 12H9"/></svg></button>
   </header>
 
   <div class="content">
     <!-- KPIs -->
     <section class="kpis" id="kpis">
       <div class="kpi glass"><div class="k-label">Abertas</div><div class="k-value" id="kpi-abertas">0</div></div>
-      <div class="kpi glass k-late"><div class="k-label">⚠ Atrasadas</div><div class="k-value" id="kpi-atrasadas">0</div></div>
+      <div class="kpi glass k-late"><div class="k-label">Atrasadas</div><div class="k-value" id="kpi-atrasadas">0</div></div>
       <div class="kpi glass k-today"><div class="k-label">Para hoje</div><div class="k-value" id="kpi-hoje">0</div></div>
       <div class="kpi glass"><div class="k-label">Na semana</div><div class="k-value" id="kpi-semana">0</div></div>
-      <div class="kpi glass k-done"><div class="k-label">Concluídas (mês)</div><div class="k-value" id="kpi-mes">0</div></div>
+      <div class="kpi glass k-done"><div class="k-label">Concluídas · mês</div><div class="k-value" id="kpi-mes">0</div></div>
     </section>
 
     <!-- Toolbar -->
@@ -419,7 +470,8 @@ label.field>span{display:block;font-size:12px;color:var(--text-secondary);margin
         <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
         <input class="input" id="busca" placeholder="Buscar por descrição, solicitante, tipo, tags..." oninput="render()">
       </div>
-      <button class="btn btn-ghost btn-sm" onclick="toggleFilters()">⛃ Filtros</button>
+      <button class="btn btn-ghost btn-sm" onclick="toggleFilters()">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M7 12h10M10 18h4"/></svg> Filtros</button>
       <label class="chip-toggle btn btn-ghost btn-sm" style="cursor:pointer">
         <input type="checkbox" id="ver-arquivadas" onchange="render()" style="accent-color:var(--accent)"> Arquivadas
       </label>
@@ -460,8 +512,8 @@ label.field>span{display:block;font-size:12px;color:var(--text-secondary);margin
     <form id="form-demanda" onsubmit="return false">
       <input type="hidden" id="d-id">
       <div class="grid2">
-        <label class="field"><span>Data de entrada *</span><input class="input" type="date" id="d-data_input" required></label>
-        <label class="field"><span>Prazo / prevista saída</span><input class="input" type="date" id="d-data_prevista"></label>
+        <label class="field"><span>Data de entrada *</span><input class="input" type="date" id="d-data_input" onclick="abrirCalendario(this)" required></label>
+        <label class="field"><span>Prazo / prevista saída</span><input class="input" type="date" id="d-data_prevista" onclick="abrirCalendario(this)"></label>
         <label class="field"><span>Tipo da demanda *</span><select class="input" id="d-tipo" required></select></label>
         <label class="field"><span>Categoria</span><select class="input" id="d-categoria"></select></label>
         <label class="field"><span>Solicitante</span><input class="input" id="d-solicitante" list="dl-solicitantes" placeholder="Quem pediu"></label>
@@ -469,7 +521,7 @@ label.field>span{display:block;font-size:12px;color:var(--text-secondary);margin
         <label class="field"><span>Responsável</span><input class="input" id="d-responsavel" list="dl-responsaveis" placeholder="Quem executa"></label>
         <label class="field"><span>Prioridade *</span><select class="input" id="d-prioridade" required></select></label>
         <label class="field"><span>Status *</span><select class="input" id="d-status" required></select></label>
-        <label class="field"><span>Data real de conclusão</span><input class="input" type="date" id="d-data_saida"></label>
+        <label class="field"><span>Data real de conclusão</span><input class="input" type="date" id="d-data_saida" onclick="abrirCalendario(this)"></label>
         <label class="field full"><span>Descrição *</span><textarea class="input" id="d-descricao" placeholder="O que precisa ser feito" required></textarea></label>
         <label class="field full"><span>Observações</span><textarea class="input" id="d-observacoes" placeholder="Detalhes adicionais"></textarea></label>
         <label class="field"><span>Link de referência</span><input class="input" id="d-link" placeholder="https://..."></label>
@@ -605,6 +657,29 @@ function estaAtrasada(d){
   if(!d.data_prevista_saida)return false;
   if(d.status==='Concluído'||d.status==='Arquivado'||d.is_archived)return false;
   return d.data_prevista_saida < hojeISO();
+}
+// Item 2 — abre o calendário nativo ao clicar em qualquer parte do campo de data
+function abrirCalendario(el){ try{ if(el.showPicker) el.showPicker(); }catch(e){} }
+// Item 9 — bandeira (flag) persistida no campo livre "origem" (sem mexer no schema)
+function estaFlagged(d){ return d.origem==='flag'; }
+// Data/hora da última mudança (item 5) — usa updated_at mantido pelo trigger do banco
+function fmtMudanca(ts){
+  if(!ts)return '';
+  const dt=new Date(ts);
+  if(isNaN(dt))return '';
+  const dd=String(dt.getDate()).padStart(2,'0'), mm=String(dt.getMonth()+1).padStart(2,'0');
+  const hh=String(dt.getHours()).padStart(2,'0'), mi=String(dt.getMinutes()).padStart(2,'0');
+  return `${dd}/${mm} ${hh}:${mi}`;
+}
+// Ordem do pipeline (colunas, sem "Arquivado") para mover com 1 clique (item 4)
+function pipelineOrdem(){ return CONFIG.status.filter(s=>s!=='Arquivado'); }
+// Dias até o prazo (negativo = atrasado). null se sem prazo.
+function diasAtePrazo(d){ return d.data_prevista_saida? diasEntre(hojeISO(),d.data_prevista_saida) : null; }
+// Vence nos próximos 2 dias (0,1,2) e ainda em aberto (item 10)
+function venceEm2Dias(d){
+  if(d.is_archived||d.status==='Concluído')return false;
+  const dd=diasAtePrazo(d);
+  return dd!==null && dd>=0 && dd<=2;
 }
 
 /* ============================================================
@@ -1024,9 +1099,12 @@ function ordenar(arr){
   const modo=document.getElementById('ordenacao').value;
   const prioRank={'Crítica':0,'Alta':1,'Normal':2,'Baixa':3};
   return arr.slice().sort((a,b)=>{
+    // Item 9 — cartões marcados com bandeira sempre primeiro
+    const fa=estaFlagged(a)?0:1, fb=estaFlagged(b)?0:1;
+    if(fa!==fb)return fa-fb;
     if(modo==='entrada')return (b.data_input||'').localeCompare(a.data_input||'');
     if(modo==='prioridade')return (prioRank[a.prioridade]??9)-(prioRank[b.prioridade]??9);
-    // prazo mais próximo (nulos por último)
+    // Padrão: prazo mais próximo / vencimento primeiro (nulos por último)
     const pa=a.data_prevista_saida||'9999-12-31', pb=b.data_prevista_saida||'9999-12-31';
     return pa.localeCompare(pb);
   });
@@ -1065,43 +1143,86 @@ function render(){
       return d.status===status;
     });
     const cor=STATUS_COLORS[status]||'#5b8cff';
+    // Item 10 — quantos cartões desta coluna vencem nos próximos 2 dias
+    const venc2=cards.filter(venceEm2Dias).length;
+    const alerta=venc2>0
+      ? `<span class="due-alert" title="${venc2} vence(m) nos próximos 2 dias">
+           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+           ${venc2} em 2 dias</span>`
+      : '';
     return `<div class="column">
-      <div class="col-head"><div class="c-title"><span class="col-dot" style="background:${cor}"></span>${esc(status)}</div><span class="c-count">${cards.length}</span></div>
+      <div class="col-head">
+        <div class="c-title"><span class="col-dot" style="background:${cor}"></span>${esc(status)}</div>
+        <div class="c-right">${alerta}<span class="c-count">${cards.length}</span></div>
+      </div>
       <div class="col-body">${cards.length?cards.map(cardHTML).join(''):'<div class="col-empty">Vazio</div>'}</div>
     </div>`;
   }).join('');
 }
+// Ícones SVG minimalistas (item 8)
+const IC={
+  user:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.2"/><path d="M5.5 20a6.5 6.5 0 0 1 13 0"/></svg>',
+  target:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3.5"/></svg>',
+  tool:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a3.5 3.5 0 0 0-4.7 4.5L4 16.8 7.2 20l6-6a3.5 3.5 0 0 0 4.5-4.7l-2.3 2.3-2.2-.5-.5-2.2z"/></svg>',
+  inbox:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 13l2.5-7h11L20 13"/><path d="M4 13h5l1 2h4l1-2h5v5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/></svg>',
+  clock:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
+  check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>',
+  edit:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>',
+  archive:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="4" rx="1"/><path d="M5 8v11a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8M10 12h4"/></svg>',
+  trash:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M6 6l1 14a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-14"/></svg>',
+  undo:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14 4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-3"/></svg>',
+  left:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>',
+  right:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>',
+  flag:'<svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M5 21V4h11l-1.5 4L16 12H5"/><path d="M5 4v17" fill="none"/></svg>',
+  flagOff:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21V4h11l-1.5 4L16 12H5"/></svg>'
+};
 function cardHTML(d){
   const late=estaAtrasada(d);
   const dias=diasEntre(d.data_input,hojeISO());
-  const prazoTxt = d.data_prevista_saida
-    ? `<span class="${late?'d-late':''}">⏱ ${fmtData(d.data_prevista_saida)}${late?` (${Math.abs(diasEntre(d.data_prevista_saida,hojeISO()))}d atraso)`:''}</span>`
-    : '<span>⏱ sem prazo</span>';
+  const flagged=estaFlagged(d);
+  // Item 12 — datas em chips de destaque
+  const prazoChip = d.data_prevista_saida
+    ? `<span class="date-chip ${late?'d-late':'prazo'}">${IC.clock} ${fmtData(d.data_prevista_saida)}${late?` · ${Math.abs(diasEntre(d.data_prevista_saida,hojeISO()))}d atraso`:''}</span>`
+    : `<span class="date-chip">${IC.clock} sem prazo</span>`;
+  const saidaChip = d.data_saida
+    ? `<span class="date-chip done">${IC.check} ${fmtData(d.data_saida)}</span>` : '';
   const tags=(d.tags||[]).filter(Boolean);
-  return `<div class="card prio-${esc(d.prioridade)} ${late?'late':''}">
+  // Item 4 — mover entre status (setas calculam coluna anterior/seguinte)
+  const ordem=pipelineOrdem();
+  const idx=ordem.indexOf(d.status);
+  const podePrev = idx>0 && !d.is_archived;
+  const podeNext = idx>=0 && idx<ordem.length-1 && !d.is_archived;
+  const moverHTML = !d.is_archived ? `<div class="c-move">
+      <button class="move-btn" ${podePrev?'':'disabled'} onclick="moverStatus('${d.id}',-1)" title="${podePrev?'Mover para: '+esc(ordem[idx-1]):'Início do pipeline'}">${IC.left} ${podePrev?esc(ordem[idx-1]):'—'}</button>
+      <button class="move-btn" ${podeNext?'':'disabled'} onclick="moverStatus('${d.id}',1)" title="${podeNext?'Mover para: '+esc(ordem[idx+1]):'Fim do pipeline'}">${podeNext?esc(ordem[idx+1]):'—'} ${IC.right}</button>
+    </div>` : '';
+  return `<div class="card prio-${esc(d.prioridade)} ${late?'late':''} ${flagged?'flagged':''}">
     <div class="c-top">
       <span class="tag tipo">${esc(d.tipo_demanda||'—')}</span>
       <span class="tag prio-${esc(d.prioridade)}">${esc(d.prioridade||'')}</span>
       ${late?'<span class="late-badge">ATRASADA</span>':''}
+      <button class="flag-btn ${flagged?'on':''}" onclick="toggleFlag('${d.id}')" title="${flagged?'Remover destaque':'Destacar como importante'}">${flagged?IC.flag:IC.flagOff}</button>
     </div>
     <div class="c-desc">${esc(d.descricao||'')}</div>
     <div class="c-meta">
-      ${d.solicitante?`<div>👤 Solicitante: <b>${esc(d.solicitante)}</b></div>`:''}
-      ${d.destino_demanda?`<div>🎯 Destino: <b>${esc(d.destino_demanda)}</b></div>`:''}
-      ${d.responsavel?`<div>🛠 Responsável: <b>${esc(d.responsavel)}</b></div>`:''}
+      ${d.solicitante?`<div>${IC.user} Solicitante: <b>${esc(d.solicitante)}</b></div>`:''}
+      ${d.destino_demanda?`<div>${IC.target} Destino: <b>${esc(d.destino_demanda)}</b></div>`:''}
+      ${d.responsavel?`<div>${IC.tool} Responsável: <b>${esc(d.responsavel)}</b></div>`:''}
     </div>
     <div class="c-dates">
-      <span>📥 ${fmtData(d.data_input)}</span>
-      ${prazoTxt}
-      <span>· ${dias>=0?dias:0}d em aberto</span>
+      <span class="date-chip">${IC.inbox} ${fmtData(d.data_input)}</span>
+      ${prazoChip}
+      ${saidaChip}
     </div>
+    ${d.updated_at?`<div class="c-changed">${IC.clock} Status alterado em ${fmtMudanca(d.updated_at)} · ${dias>=0?dias:0}d em aberto</div>`:''}
     ${tags.length?`<div class="c-tags">${tags.map(t=>`<span class="t">#${esc(t)}</span>`).join('')}</div>`:''}
     ${d.percentual_progresso?`<div class="progress"><i style="width:${Math.min(100,d.percentual_progresso)}%"></i></div>`:''}
+    ${moverHTML}
     <div class="c-actions">
-      <button class="icon-btn" onclick="openModal('${d.id}')">✎ Editar</button>
-      ${d.status!=='Concluído'?`<button class="icon-btn ok" onclick="concluirDemanda('${d.id}')">✔ Concluir</button>`:''}
-      ${!d.is_archived?`<button class="icon-btn arch" onclick="arquivarDemanda('${d.id}')">📦 Arquivar</button>`:`<button class="icon-btn" onclick="desarquivar('${d.id}')">↩ Reativar</button>`}
-      <button class="icon-btn del" onclick="excluirDemanda('${d.id}')">🗑 Excluir</button>
+      <button class="icon-btn" onclick="openModal('${d.id}')">${IC.edit} Editar</button>
+      ${d.status!=='Concluído'?`<button class="icon-btn ok" onclick="concluirDemanda('${d.id}')">${IC.check} Concluir</button>`:''}
+      ${!d.is_archived?`<button class="icon-btn arch" onclick="arquivarDemanda('${d.id}')">${IC.archive} Arquivar</button>`:`<button class="icon-btn" onclick="desarquivar('${d.id}')">${IC.undo} Reativar</button>`}
+      <button class="icon-btn del" onclick="excluirDemanda('${d.id}')">${IC.trash} Excluir</button>
     </div>
   </div>`;
 }
@@ -1217,8 +1338,39 @@ async function concluirDemanda(id){
   try{
     const{error}=await sb.from('demandas').update({status:'Concluído',data_saida:hojeISO(),percentual_progresso:100}).eq('id',id);
     if(error)throw error;
-    showToast('Demanda concluída ✔','success');
+    showToast('Demanda concluída','success');
     await carregarDemandas();
+  }catch(err){showToast('Erro: '+err.message,'error');}
+}
+/* Item 4/5 — move a demanda para o status anterior/seguinte do pipeline com 1 clique.
+   O updated_at é atualizado automaticamente pelo trigger (data da mudança de status).
+   Ao chegar em "Concluído", a data real de conclusão é preenchida automaticamente. */
+async function moverStatus(id,dir){
+  const d=DEMANDAS.find(x=>x.id===id); if(!d)return;
+  const ordem=pipelineOrdem();
+  const idx=ordem.indexOf(d.status);
+  const novo=ordem[idx+dir];
+  if(!novo)return;
+  const payload={status:novo};
+  if(novo==='Concluído'){ payload.data_saida=hojeISO(); payload.percentual_progresso=100; }
+  else if(d.status==='Concluído'){ payload.data_saida=null; } // saiu de concluído -> limpa data real
+  try{
+    const{error}=await sb.from('demandas').update(payload).eq('id',id);
+    if(error)throw error;
+    showToast('Movida para “'+novo+'”','success',2200);
+    await carregarDemandas();
+  }catch(err){showToast('Erro: '+err.message,'error');}
+}
+/* Item 9 — liga/desliga a bandeira de importante (persistido no campo "origem"). */
+async function toggleFlag(id){
+  const d=DEMANDAS.find(x=>x.id===id); if(!d)return;
+  const novo = estaFlagged(d)? null : 'flag';
+  try{
+    const{error}=await sb.from('demandas').update({origem:novo}).eq('id',id);
+    if(error)throw error;
+    d.origem=novo;            // atualização otimista
+    render();
+    showToast(novo?'Demanda destacada':'Destaque removido','success',1800);
   }catch(err){showToast('Erro: '+err.message,'error');}
 }
 async function arquivarDemanda(id){
@@ -1261,8 +1413,13 @@ function abrirConfirm(title,msg,cb){
 }
 function closeConfirm(){document.getElementById('modal-confirm').classList.remove('show');}
 
-/* Fecha overlays clicando fora */
-document.querySelectorAll('.overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('show');}));
+/* Item 3 — o formulário de demanda (e os de perfil/config) NÃO fecham ao clicar fora,
+   para evitar fechamento acidental. Só fecham pelos botões Cancelar/Salvar/Fechar.
+   Apenas o diálogo de confirmação continua fechando ao clicar fora. */
+const NAO_FECHA_FORA=['modal-demanda','modal-config','modal-profile'];
+document.querySelectorAll('.overlay').forEach(o=>o.addEventListener('click',e=>{
+  if(e.target===o && !NAO_FECHA_FORA.includes(o.id)) o.classList.remove('show');
+}));
 
 /* ============================================================
    INIT — verifica sessão existente
