@@ -174,51 +174,68 @@ label.field>span{display:block;font-size:12px;color:var(--text-secondary);margin
 .user-chip span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .content{padding:18px;max-width:1500px;margin:0 auto;width:100%}
 
-/* ===================== KPIs ===================== */
-.kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:16px}
-.kpi{padding:10px 13px;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center}
-.kpi .k-label{font-size:10.5px;color:var(--text-secondary);font-weight:600;margin-bottom:4px;display:flex;align-items:center;gap:5px;text-transform:uppercase;letter-spacing:.4px}
-.kpi .k-value{font-family:'Sora',sans-serif;font-size:21px;font-weight:700;line-height:1}
+/* ===================== KPIs (compactos / delicados — item 4) ===================== */
+.kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:12px}
+/* MELHORIA: cards de indicador menores e em linha — leitura rápida, sobra espaço pro pipeline */
+.kpi{padding:8px 12px;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:space-between;gap:8px;border-radius:12px}
+.kpi .k-label{font-size:9.5px;color:var(--text-secondary);font-weight:600;display:flex;align-items:center;gap:4px;text-transform:uppercase;letter-spacing:.3px;line-height:1.15}
+.kpi .k-value{font-family:'Sora',sans-serif;font-size:20px;font-weight:700;line-height:1;flex-shrink:0}
 .kpi.k-late .k-value{color:var(--danger)}
 .kpi.k-today .k-value{color:var(--warning)}
 .kpi.k-done .k-value{color:var(--success)}
-.kpi::after{content:"";position:absolute;right:-18px;top:-18px;width:56px;height:56px;border-radius:50%;background:var(--accent-glow);filter:blur(20px);opacity:.45}
+.kpi::after{content:"";position:absolute;right:-16px;top:-16px;width:44px;height:44px;border-radius:50%;background:var(--accent-glow);filter:blur(18px);opacity:.4}
 .kpi.k-late::after{background:rgba(255,93,108,.3)}
 .kpi.k-today::after{background:rgba(245,165,36,.3)}
 .kpi.k-done::after{background:rgba(34,199,154,.3)}
 
-/* ===================== TOOLBAR / FILTROS ===================== */
-.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
-.search-wrap{position:relative;flex:1;min-width:220px}
+/* ===================== TOOLBAR / FILTROS (item 2 e 3) ===================== */
+/* MELHORIA: barra de busca removida; agora um botão compacto abre o painel de busca + filtros */
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
+.toolbar .spacer{flex:1}
+/* Botão de busca/filtros com badge de filtros ativos */
+.filter-trigger{position:relative}
+.filter-trigger.active{background:rgba(91,140,255,.18);border-color:rgba(91,140,255,.45);color:#fff}
+.filter-count{display:none;align-items:center;justify-content:center;min-width:17px;height:17px;padding:0 4px;
+  font-size:10.5px;font-weight:700;color:#fff;background:linear-gradient(135deg,var(--accent),var(--accent-2));
+  border-radius:20px;line-height:1}
+.filter-count.show{display:inline-flex}
+.search-wrap{position:relative;width:100%}
 .search-wrap svg{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--text-muted)}
 .search-wrap .input{padding-left:38px}
-.filters{display:none;gap:10px;flex-wrap:wrap;margin-bottom:16px;padding:14px;align-items:flex-end}
-.filters.open{display:flex}
-.filters .field-min{min-width:150px;flex:1}
+/* Painel recolhível com busca + filtros inteligentes */
+.filters{display:none;gap:12px;flex-wrap:wrap;margin-bottom:14px;padding:16px;align-items:flex-end}
+.filters.open{display:flex;animation:panelDown .22s ease}
+@keyframes panelDown{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+.filters .field-min{min-width:150px;flex:1 1 150px}
+.filters .field-search{flex:1 1 100%}
 .filters .field-min span{font-size:11px;color:var(--text-secondary);font-weight:600;display:block;margin-bottom:5px}
 .chip-toggle{display:inline-flex;align-items:center;gap:7px}
 
-/* ===================== KANBAN ===================== */
-.board{display:flex;gap:14px;overflow-x:auto;padding-bottom:14px;align-items:flex-start;scroll-snap-type:x proximity}
-.column{flex:0 0 340px;display:flex;flex-direction:column;max-height:calc(100vh - 220px);scroll-snap-align:start}
-.col-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:11px 14px;border-radius:14px 14px 0 0;
+/* ===================== KANBAN (itens 1 e 5 — cabe tudo na tela, sem scroll lateral) ===================== */
+/* MELHORIA: grid de colunas com largura igual e flexível (--cols definido via JS conforme o nº de etapas).
+   minmax(0,1fr) permite encolher abaixo do conteúdo, então as 6 etapas cabem na largura sem rolar pro lado. */
+.board{display:grid;grid-template-columns:repeat(var(--cols,6),minmax(0,1fr));gap:10px;padding-bottom:14px;align-items:start}
+.column{min-width:0;display:flex;flex-direction:column;max-height:calc(100vh - 188px)}
+.col-head{display:flex;align-items:center;justify-content:space-between;gap:6px;padding:9px 11px;border-radius:13px 13px 0 0;
   border:1px solid var(--glass-border);border-bottom:none;background:rgba(255,255,255,0.05)}
-.col-head .c-title{font-family:'Sora',sans-serif;font-size:13.5px;font-weight:600;display:flex;align-items:center;gap:8px}
-.col-head .c-right{display:flex;align-items:center;gap:6px}
-.col-head .c-count{font-size:11.5px;color:var(--text-secondary);background:rgba(255,255,255,0.09);padding:2px 9px;border-radius:20px;font-weight:600}
-.col-dot{width:9px;height:9px;border-radius:50%}
+.col-head .c-title{font-family:'Sora',sans-serif;font-size:12px;font-weight:600;display:flex;align-items:center;gap:6px;min-width:0;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.col-head .c-right{display:flex;align-items:center;gap:5px;flex-shrink:0}
+.col-head .c-count{font-size:11px;color:var(--text-secondary);background:rgba(255,255,255,0.09);padding:2px 8px;border-radius:20px;font-weight:600}
+.col-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
 /* Item 10 — alerta de vencimentos nos próximos 2 dias por coluna */
-.due-alert{display:inline-flex;align-items:center;gap:4px;font-size:10.5px;font-weight:700;
+.due-alert{display:inline-flex;align-items:center;gap:3px;font-size:9.5px;font-weight:700;
   color:#ffd9a0;background:rgba(247,177,60,.16);border:1px solid rgba(247,177,60,.4);
-  padding:2px 8px;border-radius:20px;white-space:nowrap}
-.due-alert svg{width:11px;height:11px}
-.col-body{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:11px;
-  border:1px solid var(--glass-border);border-top:none;border-radius:0 0 14px 14px;background:rgba(255,255,255,0.02);min-height:90px}
-.col-empty{color:var(--text-muted);font-size:12.5px;text-align:center;padding:24px 6px;border:1px dashed var(--glass-border);border-radius:12px}
+  padding:2px 6px;border-radius:20px;white-space:nowrap}
+.due-alert svg{width:10px;height:10px}
+.col-body{flex:1;overflow-y:auto;padding:9px;display:flex;flex-direction:column;gap:9px;
+  border:1px solid var(--glass-border);border-top:none;border-radius:0 0 13px 13px;background:rgba(255,255,255,0.02);min-height:80px}
+.col-empty{color:var(--text-muted);font-size:11.5px;text-align:center;padding:18px 6px;border:1px dashed var(--glass-border);border-radius:10px}
 
-/* ===================== CARD ===================== */
-.card{padding:14px;border-radius:14px;background:var(--bg-card);border:1px solid var(--glass-border);
-  border-left:4px solid var(--text-muted);transition:.18s;cursor:default;position:relative;
+/* ===================== CARD (compacto — cabe nas colunas estreitas) ===================== */
+/* MELHORIA: padding e tipografia reduzidos; min-width:0 garante que o texto quebre dentro da coluna */
+.card{padding:11px;border-radius:12px;background:var(--bg-card);border:1px solid var(--glass-border);
+  border-left:4px solid var(--text-muted);transition:.18s;cursor:default;position:relative;min-width:0;
   box-shadow:0 4px 16px rgba(0,0,0,.22)}
 .card:hover{background:var(--bg-card-hover);transform:translateY(-2px);box-shadow:0 8px 26px rgba(0,0,0,.30)}
 .card.late{border-left-color:var(--danger);box-shadow:0 0 0 1px rgba(255,97,115,.4),0 6px 22px rgba(255,97,115,.16)}
@@ -241,9 +258,10 @@ label.field>span{display:block;font-size:12px;color:var(--text-secondary);margin
 .flag-btn:hover{color:var(--warning);background:rgba(247,177,60,.14)}
 .flag-btn.on{color:var(--warning)}
 .flag-btn svg{width:16px;height:16px}
-.card .c-desc{font-size:14px;font-weight:600;line-height:1.4;margin-bottom:10px;color:var(--text-primary)}
-.card .c-meta{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--text-secondary);margin-bottom:10px}
-.card .c-meta div{display:flex;align-items:center;gap:6px}
+.card .c-desc{font-size:13px;font-weight:600;line-height:1.38;margin-bottom:9px;color:var(--text-primary);overflow-wrap:anywhere}
+.card .c-meta{display:flex;flex-direction:column;gap:4px;font-size:11.5px;color:var(--text-secondary);margin-bottom:9px}
+.card .c-meta div{display:flex;align-items:center;gap:6px;min-width:0}
+.card .c-meta b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .card .c-meta b{color:var(--text-primary);font-weight:600}
 .card .c-meta svg{width:13px;height:13px;color:var(--text-muted);flex-shrink:0}
 /* Item 12 — datas em destaque (chips) */
@@ -266,12 +284,12 @@ label.field>span{display:block;font-size:12px;color:var(--text-secondary);margin
 .progress>i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-2));border-radius:6px}
 /* Item 4 — mover entre status com 1 clique */
 .c-move{display:flex;align-items:center;gap:6px;margin-bottom:9px}
-.move-btn{flex:1;background:rgba(255,255,255,.06);border:1px solid var(--glass-border);color:var(--text-secondary);
-  cursor:pointer;border-radius:8px;padding:6px;display:inline-flex;align-items:center;justify-content:center;gap:5px;
-  font-size:11px;font-weight:600;transition:.18s}
+.move-btn{flex:1;min-width:0;background:rgba(255,255,255,.06);border:1px solid var(--glass-border);color:var(--text-secondary);
+  cursor:pointer;border-radius:8px;padding:6px 5px;display:inline-flex;align-items:center;justify-content:center;gap:4px;
+  font-size:10.5px;font-weight:600;transition:.18s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .move-btn:hover:not(:disabled){background:rgba(91,140,255,.18);color:#fff;border-color:rgba(91,140,255,.4)}
 .move-btn:disabled{opacity:.3;cursor:not-allowed}
-.move-btn svg{width:13px;height:13px}
+.move-btn svg{width:12px;height:12px;flex-shrink:0}
 .card .c-actions{display:flex;gap:6px;flex-wrap:wrap}
 .card .c-actions .icon-btn{background:rgba(255,255,255,.07);font-size:11px;padding:6px 9px;gap:5px;color:var(--text-secondary)}
 .card .c-actions .icon-btn svg{width:13px;height:13px}
@@ -325,22 +343,27 @@ label.field>span{display:block;font-size:12px;color:var(--text-secondary);margin
 .board-empty h3{font-size:18px;margin-bottom:6px;color:var(--text-primary)}
 
 /* ===================== RESPONSIVO ===================== */
+/* MELHORIA: o pipeline reflui por breakpoint (grid), sempre cabendo na largura — nunca rola pro lado */
+@media (max-width:1180px){
+  .board{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+}
 @media (max-width:900px){
   .kpis{grid-template-columns:repeat(3,1fr)}
-  .kpi:nth-child(4),.kpi:nth-child(5){grid-column:span 1}
+  .board{grid-template-columns:repeat(2,minmax(0,1fr))!important}
 }
 @media (max-width:640px){
   .content{padding:13px}
   .topbar{padding:10px 13px;gap:10px}
   .topbar .brand{font-size:15px}
   .topbar .new-txt{display:none}
-  .kpis{grid-template-columns:repeat(2,1fr);gap:9px}
-  .kpi .k-value{font-size:23px}
+  .kpis{grid-template-columns:repeat(2,1fr);gap:8px}
+  .kpi .k-value{font-size:20px}
   .user-chip{max-width:120px;padding:6px 10px}
-  /* Kanban empilhado no celular */
-  .board{flex-direction:column;overflow-x:visible}
-  .column{flex:1 1 auto;width:100%;max-height:none}
+  /* Kanban empilhado no celular (1 coluna), só rola pra baixo */
+  .board{grid-template-columns:1fr!important}
+  .column{width:100%;max-height:none}
   .col-body{max-height:none}
+  .toolbar{gap:7px}
   /* Modal tela cheia no mobile */
   .overlay{padding:0}
   .modal{max-width:100%;min-height:100vh;border-radius:0;margin:0}
@@ -438,7 +461,7 @@ label.field>span{display:block;font-size:12px;color:var(--text-secondary);margin
 <!-- ===================== APLICAÇÃO ===================== -->
 <div id="app">
   <header class="topbar">
-    <div class="brand">Pipeline de Demandas<small>Sistema pessoal · Ítalo</small></div>
+    <div class="brand">Pipeline de Demandas<small>System PDR</small></div>
     <div class="spacer"></div>
     <button class="btn btn-primary btn-sm" onclick="openModal()" title="Nova demanda">
       <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
@@ -464,17 +487,17 @@ label.field>span{display:block;font-size:12px;color:var(--text-secondary);margin
       <div class="kpi glass k-done"><div class="k-label">Concluídas · mês</div><div class="k-value" id="kpi-mes">0</div></div>
     </section>
 
-    <!-- Toolbar -->
+    <!-- Toolbar — item 2: botão único que expande busca + filtros inteligentes -->
     <div class="toolbar">
-      <div class="search-wrap">
-        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
-        <input class="input" id="busca" placeholder="Buscar por descrição, solicitante, tipo, tags..." oninput="render()">
-      </div>
-      <button class="btn btn-ghost btn-sm" onclick="toggleFilters()">
-        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M7 12h10M10 18h4"/></svg> Filtros</button>
+      <button class="btn btn-ghost btn-sm filter-trigger" id="filter-trigger" onclick="toggleFilters()" title="Buscar e filtrar demandas">
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-3.5-3.5"/></svg>
+        Buscar e filtrar
+        <span class="filter-count" id="filter-count">0</span>
+      </button>
       <label class="chip-toggle btn btn-ghost btn-sm" style="cursor:pointer">
         <input type="checkbox" id="ver-arquivadas" onchange="render()" style="accent-color:var(--accent)"> Arquivadas
       </label>
+      <div class="spacer"></div>
       <select class="input btn-sm" id="ordenacao" style="width:auto" onchange="render()">
         <option value="prazo">Ordenar: prazo mais próximo</option>
         <option value="entrada">Ordenar: entrada recente</option>
@@ -482,16 +505,22 @@ label.field>span{display:block;font-size:12px;color:var(--text-secondary);margin
       </select>
     </div>
 
-    <!-- Filtros -->
+    <!-- Painel de busca + filtros inteligentes (item 3) — respeita a granularidade das listas -->
     <div class="filters glass" id="filters">
+      <label class="field-min field-search"><span>Busca livre</span>
+        <div class="search-wrap">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
+          <input class="input" id="busca" placeholder="Descrição, solicitante, tipo, responsável, destino, observações, tags..." oninput="render()">
+        </div>
+      </label>
       <label class="field-min"><span>Status</span><select class="input" id="f-status" onchange="render()"></select></label>
       <label class="field-min"><span>Tipo</span><select class="input" id="f-tipo" onchange="render()"></select></label>
       <label class="field-min"><span>Prioridade</span><select class="input" id="f-prioridade" onchange="render()"></select></label>
       <label class="field-min"><span>Solicitante</span><select class="input" id="f-solicitante" onchange="render()"></select></label>
       <label class="field-min"><span>Destino</span><select class="input" id="f-destino" onchange="render()"></select></label>
       <label class="field-min"><span>Responsável</span><select class="input" id="f-responsavel" onchange="render()"></select></label>
-      <label class="field-min" style="flex:0"><span>&nbsp;</span>
-        <label class="chip-toggle" style="font-size:12.5px;color:var(--text-secondary)"><input type="checkbox" id="f-atraso" onchange="render()" style="accent-color:var(--danger)"> Só atrasadas</label>
+      <label class="field-min" style="flex:0 0 auto"><span>&nbsp;</span>
+        <label class="chip-toggle" style="font-size:12.5px;color:var(--text-secondary);height:43px"><input type="checkbox" id="f-atraso" onchange="render()" style="accent-color:var(--danger)"> Só atrasadas</label>
       </label>
       <button class="btn btn-ghost btn-sm" onclick="limparFiltros()">Limpar filtros</button>
     </div>
@@ -1109,7 +1138,25 @@ function ordenar(arr){
     return pa.localeCompare(pb);
   });
 }
-function toggleFilters(){document.getElementById('filters').classList.toggle('open');}
+// Item 2 — abre/fecha o painel de busca + filtros pelo botão
+function toggleFilters(){
+  const aberto=document.getElementById('filters').classList.toggle('open');
+  document.getElementById('filter-trigger').classList.toggle('active',aberto);
+  if(aberto){ const b=document.getElementById('busca'); if(b) setTimeout(()=>b.focus(),60); }
+  atualizarBadgeFiltros();
+}
+// Item 3 — conta filtros ativos e mostra o número no botão (badge)
+function atualizarBadgeFiltros(){
+  const ids=['f-status','f-tipo','f-prioridade','f-solicitante','f-destino','f-responsavel'];
+  let n=ids.reduce((acc,id)=>{const el=document.getElementById(id);return acc+(el&&el.value?1:0);},0);
+  if(document.getElementById('f-atraso')&&document.getElementById('f-atraso').checked) n++;
+  if(document.getElementById('busca')&&document.getElementById('busca').value.trim()) n++;
+  const badge=document.getElementById('filter-count');
+  const trig=document.getElementById('filter-trigger');
+  if(badge){ badge.textContent=n; badge.classList.toggle('show',n>0); }
+  // mantém o botão destacado se há filtros ativos OU o painel está aberto
+  if(trig){ trig.classList.toggle('active', n>0 || document.getElementById('filters').classList.contains('open')); }
+}
 function limparFiltros(){
   ['f-status','f-tipo','f-prioridade','f-solicitante','f-destino','f-responsavel'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('f-atraso').checked=false;
@@ -1122,14 +1169,18 @@ function limparFiltros(){
    ============================================================ */
 function render(){
   const board=document.getElementById('board');
-  board.style.display='flex';
+  board.style.display='grid';
+  atualizarBadgeFiltros();                 // item 3 — reflete filtros ativos no botão
   const verArq=document.getElementById('ver-arquivadas').checked;
   let lista=ordenar(aplicarFiltros());
 
   // Colunas = status configurados. Se vendo arquivadas, mostra só "Arquivado".
   let colunas = verArq ? ['Arquivado'] : CONFIG.status.filter(s=>s!=='Arquivado');
+  // MELHORIA (itens 1/5): nº de colunas dirige o grid — tudo cabe na largura, sem scroll lateral
+  board.style.setProperty('--cols', Math.max(1, colunas.length));
 
   if(lista.length===0){
+    board.style.setProperty('--cols', 1);
     board.innerHTML=`<div class="board-empty" style="width:100%"><div class="big">🗂️</div><h3>Nenhuma demanda por aqui</h3><p>${verArq?'Você não tem demandas arquivadas.':'Clique em “Nova Demanda” para começar a registrar.'}</p></div>`;
     return;
   }
