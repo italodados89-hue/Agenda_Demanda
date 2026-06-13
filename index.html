@@ -372,6 +372,85 @@ label.field>span{display:block;font-size:12px;color:var(--text-secondary);margin
   .modal-foot{position:sticky;bottom:0;background:var(--bg-secondary);padding-top:12px}
 }
 .hidden{display:none!important}
+
+/* ===================== EQUIPES / COLABORAÇÃO ===================== */
+/* Botão Equipe no topbar com contador de pendências */
+.team-btn{position:relative}
+.team-badge{position:absolute;top:-5px;right:-5px;min-width:17px;height:17px;padding:0 4px;
+  font-size:10px;font-weight:700;color:#fff;background:var(--danger);border-radius:20px;
+  display:none;align-items:center;justify-content:center;line-height:1;box-shadow:0 0 0 2px var(--bg-primary)}
+.team-badge.show{display:inline-flex}
+
+/* Cartão de equipe dentro do modal */
+.team-card{border:1px solid var(--glass-border);border-radius:14px;padding:14px;margin-bottom:12px;background:rgba(255,255,255,.03)}
+.team-card .t-head{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.team-card .t-head h4{font-family:'Sora';font-size:14.5px;font-weight:600;flex:1;min-width:0;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.team-card .t-owner{font-size:9.5px;font-weight:700;padding:3px 8px;border-radius:20px;
+  background:rgba(155,107,255,.2);color:#c9b3ff;text-transform:uppercase;letter-spacing:.3px}
+.team-card .t-member{font-size:9.5px;font-weight:700;padding:3px 8px;border-radius:20px;
+  background:rgba(91,140,255,.18);color:#bcd0ff;text-transform:uppercase;letter-spacing:.3px}
+.member-row{display:flex;align-items:center;gap:9px;padding:7px 9px;border-radius:10px;
+  background:rgba(255,255,255,.04);margin-bottom:6px}
+.member-row .m-ava{width:30px;height:30px;border-radius:50%;flex-shrink:0;object-fit:cover;
+  background:linear-gradient(135deg,var(--accent),var(--accent-2));display:flex;align-items:center;
+  justify-content:center;font-weight:700;font-size:12px;color:#fff;overflow:hidden}
+.member-row .m-ava img{width:100%;height:100%;object-fit:cover}
+.member-row .m-info{flex:1;min-width:0}
+.member-row .m-info b{display:block;font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.member-row .m-info small{font-size:10.5px;color:var(--text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+.m-status{font-size:9px;font-weight:700;padding:3px 7px;border-radius:20px;flex-shrink:0}
+.m-status.pending{background:rgba(245,165,36,.18);color:#ffce80}
+.m-status.accepted{background:rgba(34,199,154,.18);color:#7fe6c5}
+.m-status.declined{background:rgba(255,93,108,.16);color:#ffb0b9}
+.member-row .m-del{background:transparent;border:none;color:var(--text-muted);cursor:pointer;
+  font-size:16px;line-height:1;padding:2px 5px;border-radius:6px;flex-shrink:0}
+.member-row .m-del:hover{color:var(--danger);background:rgba(255,93,108,.12)}
+.invite-row{display:flex;gap:7px;margin-top:9px}
+.invite-row .input{padding:9px 11px;font-size:13px}
+.team-create{border:1px dashed var(--glass-border);border-radius:14px;padding:14px;background:rgba(91,140,255,.05)}
+.team-create h4{font-family:'Sora';font-size:13.5px;margin-bottom:9px}
+
+/* Item de convite (modal de convites pendentes ao logar) */
+.invite-card{border:1px solid var(--glass-border);border-radius:14px;padding:15px;margin-bottom:12px;
+  background:rgba(255,255,255,.04)}
+.invite-card p{font-size:13.5px;line-height:1.5;margin-bottom:13px}
+.invite-card p b{color:#bcd0ff}
+.invite-card .actions{display:flex;gap:9px}
+
+/* Avatar do responsável no card do Kanban (foto = aprovado) */
+.assignee{display:flex;align-items:center;gap:7px;margin-bottom:9px;padding:6px 8px;border-radius:9px;
+  background:rgba(255,255,255,.05);border:1px solid var(--glass-border)}
+.assignee .a-ava{width:26px;height:26px;border-radius:50%;flex-shrink:0;object-fit:cover;overflow:hidden;
+  background:linear-gradient(135deg,var(--accent),var(--accent-2));display:flex;align-items:center;
+  justify-content:center;font-weight:700;font-size:11px;color:#fff;position:relative}
+.assignee .a-ava img{width:100%;height:100%;object-fit:cover}
+.assignee .a-txt{flex:1;min-width:0;font-size:11.5px;color:var(--text-secondary);overflow:hidden}
+.assignee .a-txt b{color:var(--text-primary);font-weight:600;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.assignee.approved{border-color:rgba(34,199,154,.45);background:rgba(34,199,154,.10)}
+.assignee.approved .a-ava{box-shadow:0 0 0 2px var(--success)}
+.assignee.pending{border-color:rgba(245,165,36,.45);background:rgba(245,165,36,.10)}
+.assignee.declined{border-color:rgba(255,93,108,.4);background:rgba(255,93,108,.10)}
+.assign-flag{font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;flex-shrink:0}
+.assign-flag.pending{background:rgba(245,165,36,.22);color:#ffce80}
+.assign-flag.approved{background:rgba(34,199,154,.22);color:#7fe6c5}
+.assign-flag.declined{background:rgba(255,93,108,.22);color:#ffb0b9}
+.a-check{position:absolute;bottom:-2px;right:-2px;width:13px;height:13px;border-radius:50%;
+  background:var(--success);display:flex;align-items:center;justify-content:center;border:1.5px solid var(--bg-primary)}
+.a-check svg{width:8px;height:8px;color:#fff}
+/* Selo de pendência no topo do card (falta aprovar) */
+.card.assign-pending{box-shadow:0 0 0 1px rgba(245,165,36,.5),0 6px 22px rgba(245,165,36,.14)}
+
+/* Histórico de movimentações */
+.moves-box{margin-bottom:9px;border:1px solid var(--glass-border);border-radius:9px;
+  background:rgba(255,255,255,.03);padding:8px 9px}
+.moves-box .mv{font-size:10.5px;color:var(--text-secondary);line-height:1.45;padding:3px 0;border-bottom:1px solid rgba(255,255,255,.05)}
+.moves-box .mv:last-child{border-bottom:none}
+.moves-box .mv b{color:var(--text-primary)}
+.moves-box .mv .mv-note{color:var(--text-secondary);font-style:italic}
+.card .c-moves-hint{font-size:10px;color:var(--text-muted);margin-bottom:8px;display:flex;align-items:center;gap:5px;cursor:pointer}
+.card .c-moves-hint:hover{color:var(--text-secondary)}
+.card .c-moves-hint svg{width:11px;height:11px}
 </style>
 </head>
 <body>
@@ -463,6 +542,11 @@ label.field>span{display:block;font-size:12px;color:var(--text-secondary);margin
   <header class="topbar">
     <div class="brand">Pipeline de Demandas<small>System PDR</small></div>
     <div class="spacer"></div>
+    <button class="btn btn-ghost btn-sm team-btn" onclick="openTeam()" title="Equipes e colaboração">
+      <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      <span class="new-txt">Equipe</span>
+      <span class="team-badge" id="team-badge">0</span>
+    </button>
     <button class="btn btn-primary btn-sm" onclick="openModal()" title="Nova demanda">
       <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
       <span class="new-txt">Nova Demanda</span></button>
@@ -547,7 +631,11 @@ label.field>span{display:block;font-size:12px;color:var(--text-secondary);margin
         <label class="field"><span>Categoria</span><select class="input" id="d-categoria"></select></label>
         <label class="field"><span>Solicitante</span><input class="input" id="d-solicitante" list="dl-solicitantes" placeholder="Quem pediu"></label>
         <label class="field"><span>Destino da demanda</span><select class="input" id="d-destino"></select></label>
-        <label class="field"><span>Responsável</span><input class="input" id="d-responsavel" list="dl-responsaveis" placeholder="Quem executa"></label>
+        <label class="field"><span>Responsável (texto livre)</span><input class="input" id="d-responsavel" list="dl-responsaveis" placeholder="Quem executa"></label>
+        <label class="field"><span>Equipe</span><select class="input" id="d-team" onchange="atualizarMembrosAtribuir()"><option value="">Pessoal (sem equipe)</option></select></label>
+        <label class="field full" id="d-assign-wrap" style="display:none"><span>Atribuir a (responsável da equipe) — precisa aprovar</span>
+          <select class="input" id="d-assigned"><option value="">— ninguém —</option></select>
+        </label>
         <label class="field"><span>Prioridade *</span><select class="input" id="d-prioridade" required></select></label>
         <label class="field"><span>Status *</span><select class="input" id="d-status" required></select></label>
         <label class="field"><span>Data real de conclusão</span><input class="input" type="date" id="d-data_saida" onclick="abrirCalendario(this)"></label>
@@ -558,6 +646,10 @@ label.field>span{display:block;font-size:12px;color:var(--text-secondary);margin
         <label class="field full"><span>Progresso: <b id="prog-val">0</b>%</span>
           <div class="range-row"><input type="range" id="d-progresso" min="0" max="100" value="0" oninput="document.getElementById('prog-val').textContent=this.value"></div>
         </label>
+        <div class="field full" id="d-moves-section" style="display:none">
+          <span style="display:block;font-size:12px;color:var(--text-secondary);margin-bottom:6px;font-weight:600">Histórico de movimentações</span>
+          <div class="moves-box" id="d-moves-list"></div>
+        </div>
       </div>
       <datalist id="dl-solicitantes"></datalist>
       <datalist id="dl-responsaveis"></datalist>
@@ -623,6 +715,57 @@ label.field>span{display:block;font-size:12px;color:var(--text-secondary);margin
   </div>
 </div>
 
+<!-- ===================== MODAL EQUIPE ===================== -->
+<div class="overlay" id="modal-team">
+  <div class="modal glass">
+    <h2>👥 Equipes</h2>
+    <div class="m-sub">Monte equipes, convide pessoas pelo e-mail e atribua demandas a elas. Qualquer membro aceito pode convidar e atribuir tarefas a colegas do time.</div>
+    <div id="team-body"><div class="spinner" style="margin:30px auto"></div></div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeTeam()">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== MODAL CONVITES PENDENTES ===================== -->
+<div class="overlay" id="modal-invites">
+  <div class="modal glass" style="max-width:480px">
+    <h2>📨 Convites de equipe</h2>
+    <div class="m-sub">Você foi convidado para participar de uma ou mais equipes. Aceite para colaborar e receber demandas.</div>
+    <div id="invites-body"></div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeInvites()">Decidir depois</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== MODAL APROVAÇÃO DE ATRIBUIÇÃO ===================== -->
+<div class="overlay" id="modal-assign">
+  <div class="modal glass" style="max-width:520px">
+    <h2>✅ Demandas atribuídas a você</h2>
+    <div class="m-sub">Estas demandas foram atribuídas a você por um colega. Aprove para confirmar que está ciente — sua foto aparecerá no card.</div>
+    <div id="assign-body"></div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeAssign()">Decidir depois</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== MODAL ANOTAÇÃO DE MOVIMENTAÇÃO ===================== -->
+<div class="overlay" id="modal-move">
+  <div class="modal glass" style="max-width:440px">
+    <h2 id="move-title">Mover demanda</h2>
+    <div class="m-sub" id="move-sub">Registre uma anotação sobre esta movimentação (opcional, mas ajuda a entender o processo).</div>
+    <label class="field"><span>Anotação da movimentação</span>
+      <textarea class="input" id="move-note" placeholder="Ex.: enviado para validação do cliente; aguardando retorno do financeiro..."></textarea>
+    </label>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeMove()">Cancelar</button>
+      <button class="btn btn-primary" id="move-confirm">Mover</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -645,6 +788,13 @@ let DEMANDAS = [];          // todas as demandas do usuário
 let CONFIG = null;          // listas configuráveis do usuário
 let authMode = 'login';
 const ADMIN_EMAIL = 'italo.dados89@gmail.com';
+
+/* ---- Estado de EQUIPES / COLABORAÇÃO ---- */
+let TEAMS = [];             // equipes em que participo (cada uma com .members[])
+let MEMBER_PROFILES = {};   // mapa user_id -> {nome,email,avatar_url} (colegas de equipe)
+let MY_INVITES = [];        // convites de equipe pendentes para o meu e-mail
+let PENDING_ASSIGN = [];    // demandas atribuídas a mim aguardando minha aprovação
+let _moveCb = null;         // callback do modal de anotação de movimentação
 
 // Listas padrão (usadas na 1ª vez / mescladas com as do usuário)
 const DEFAULTS = {
@@ -808,6 +958,7 @@ async function carregarPerfil(user){
 async function logout(){
   await sb.auth.signOut();
   USER=null;PROFILE=null;DEMANDAS=[];CONFIG=null;
+  TEAMS=[];MEMBER_PROFILES={};MY_INVITES=[];PENDING_ASSIGN=[];
   document.getElementById('app').style.display='none';
   document.getElementById('login-screen').style.display='flex';
   document.getElementById('login-pass').value='';
@@ -831,7 +982,10 @@ async function iniciarApp(user){
   document.getElementById('user-email').textContent=PROFILE.nome||user.email;
   pintarAvatarTopbar();
   await carregarConfig();
+  await carregarEquipes();      // equipes + perfis dos colegas (fotos)
   await carregarTudo();
+  await checarConvites();       // convites de equipe pendentes para mim
+  await checarAtribuicoes();    // demandas atribuídas a mim aguardando aprovação
 }
 
 /* ============================================================
@@ -1069,6 +1223,283 @@ function delCfg(key,i){
 }
 
 /* ============================================================
+   EQUIPES / COLABORAÇÃO
+   ------------------------------------------------------------
+   • carregarEquipes(): equipes em que participo + membros.
+   • carregarPerfisVisiveis(): fotos/nomes dos colegas (RLS).
+   • openTeam/renderTeamBody: painel de equipes.
+   • criarEquipe / convidarMembro / removerMembro / excluirEquipe.
+   • checarConvites: convites pendentes para mim ao logar.
+   • checarAtribuicoes: demandas atribuídas a mim p/ aprovar.
+   ============================================================ */
+async function carregarEquipes(){
+  TEAMS=[];
+  try{
+    const{data:teams,error}=await sb.from('teams').select('*').order('created_at',{ascending:true});
+    if(error)throw error;
+    const{data:members,error:e2}=await sb.from('team_members').select('*');
+    if(e2)throw e2;
+    // Só equipes onde sou DONO ou MEMBRO aceito (convites pendentes vão no modal de convites)
+    const minhas=(teams||[]).filter(t=>
+      t.owner_id===USER.id ||
+      (members||[]).some(m=>m.team_id===t.id && m.user_id===USER.id && m.status==='accepted')
+    );
+    TEAMS=minhas.map(t=>({...t,members:(members||[]).filter(m=>m.team_id===t.id)}));
+  }catch(err){ console.warn('Equipes indisponíveis:',err.message); TEAMS=[]; }
+  await carregarPerfisVisiveis();
+  atualizarBadgeEquipe();
+}
+// Perfis visíveis (eu + colegas de equipe) -> usados para mostrar foto/nome no card
+async function carregarPerfisVisiveis(){
+  MEMBER_PROFILES={};
+  if(PROFILE) MEMBER_PROFILES[USER.id]={nome:PROFILE.nome,email:PROFILE.email,avatar_url:PROFILE.avatar_url};
+  try{
+    const{data,error}=await sb.from('profiles').select('id,nome,email,avatar_url');
+    if(error)throw error;
+    (data||[]).forEach(p=>{MEMBER_PROFILES[p.id]={nome:p.nome,email:p.email,avatar_url:p.avatar_url};});
+  }catch(err){ console.warn('Perfis de equipe indisponíveis:',err.message); }
+}
+function atualizarBadgeEquipe(){
+  const n=(MY_INVITES?MY_INVITES.length:0)+(PENDING_ASSIGN?PENDING_ASSIGN.length:0);
+  const b=document.getElementById('team-badge');
+  if(b){ b.textContent=n; b.classList.toggle('show',n>0); }
+}
+
+async function openTeam(){
+  document.getElementById('modal-team').classList.add('show');
+  document.getElementById('team-body').innerHTML='<div class="spinner" style="margin:30px auto"></div>';
+  await carregarEquipes();
+  renderTeamBody();
+}
+function closeTeam(){document.getElementById('modal-team').classList.remove('show');}
+
+function renderTeamBody(){
+  const body=document.getElementById('team-body');
+  let html='';
+  if(!TEAMS.length){
+    html+='<div style="text-align:center;color:var(--text-muted);font-size:13px;padding:16px 6px;margin-bottom:6px">Você ainda não tem equipes. Crie uma abaixo e convide colegas pelo e-mail.</div>';
+  }
+  html+=TEAMS.map(t=>{
+    const souDono=t.owner_id===USER.id;
+    const membros=(t.members||[]).slice().sort((a,b)=>(b.papel==='dono'?1:0)-(a.papel==='dono'?1:0));
+    const membersHTML=membros.map(m=>{
+      const prof=m.user_id?MEMBER_PROFILES[m.user_id]:null;
+      const nome=m.nome||(prof&&prof.nome)||m.email;
+      const inicial=(nome||m.email||'?').trim().charAt(0).toUpperCase();
+      const ava=(prof&&prof.avatar_url)?`<img src="${esc(prof.avatar_url)}">`:esc(inicial);
+      const stLabel={pending:'Pendente',accepted:'Aceito',declined:'Recusou'}[m.status]||m.status;
+      const podeRemover=souDono && m.user_id!==USER.id;
+      return `<div class="member-row">
+        <div class="m-ava">${ava}</div>
+        <div class="m-info"><b>${esc(nome)}${m.papel==='dono'?' • dono':''}</b><small>${esc(m.email)}</small></div>
+        <span class="m-status ${esc(m.status)}">${stLabel}</span>
+        ${podeRemover?`<button class="m-del" onclick="removerMembro('${m.id}','${t.id}')" title="Remover da equipe">×</button>`:''}
+      </div>`;
+    }).join('');
+    return `<div class="team-card">
+      <div class="t-head">
+        <h4>${esc(t.nome)}</h4>
+        <span class="${souDono?'t-owner':'t-member'}">${souDono?'Você é dono':'Membro'}</span>
+        ${souDono?`<button class="icon-btn" onclick="excluirEquipe('${t.id}')" title="Excluir equipe" style="color:var(--danger);padding:5px">${IC.trash}</button>`:''}
+      </div>
+      ${membersHTML}
+      <div class="invite-row">
+        <input class="input" id="inv-email-${t.id}" type="email" placeholder="convidar colega pelo e-mail..." onkeydown="if(event.key==='Enter'){event.preventDefault();convidarMembro('${t.id}')}">
+        <button class="btn btn-primary btn-sm" onclick="convidarMembro('${t.id}')">Convidar</button>
+      </div>
+    </div>`;
+  }).join('');
+  html+=`<div class="team-create">
+    <h4>➕ Criar nova equipe</h4>
+    <div class="invite-row">
+      <input class="input" id="team-new-name" placeholder="Nome da equipe (ex.: Contratos LATAM)" onkeydown="if(event.key==='Enter'){event.preventDefault();criarEquipe()}">
+      <button class="btn btn-primary btn-sm" onclick="criarEquipe()">Criar</button>
+    </div>
+  </div>`;
+  body.innerHTML=html;
+}
+
+async function criarEquipe(){
+  const el=document.getElementById('team-new-name');
+  const nome=el.value.trim();
+  if(!nome){showToast('Dê um nome à equipe','error');return;}
+  try{
+    const{data:t,error}=await sb.from('teams').insert({nome,owner_id:USER.id}).select().single();
+    if(error)throw error;
+    // entro como membro 'dono' já aceito
+    const{error:e2}=await sb.from('team_members').insert({
+      team_id:t.id,user_id:USER.id,email:(PROFILE.email||USER.email),
+      nome:PROFILE.nome||null,papel:'dono',status:'accepted',invited_by:USER.id
+    });
+    if(e2)throw e2;
+    showToast('Equipe "'+nome+'" criada','success');
+    await carregarEquipes();
+    renderTeamBody();
+  }catch(err){showToast('Erro ao criar equipe: '+err.message,'error',5000);}
+}
+
+async function convidarMembro(teamId){
+  const inp=document.getElementById('inv-email-'+teamId);
+  const email=inp.value.trim().toLowerCase();
+  if(!email||!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){showToast('Informe um e-mail válido','error');return;}
+  try{
+    // procura o usuário pelo e-mail (pode ainda não estar cadastrado)
+    let achado=null;
+    try{ const{data}=await sb.rpc('lookup_user_by_email',{p_email:email}); achado=(data&&data[0])||null; }catch(e){}
+    const{error}=await sb.from('team_members').insert({
+      team_id:teamId, user_id:achado?achado.id:null, email,
+      nome:achado?achado.nome:null, papel:'membro', status:'pending', invited_by:USER.id
+    });
+    if(error){
+      if(/duplicate|unique/i.test(error.message)){showToast('Esse e-mail já está na equipe','error');return;}
+      throw error;
+    }
+    inp.value='';
+    showToast(achado?('Convite enviado para '+(achado.nome||email)):('Convite registrado para '+email+' — ele(a) verá ao se cadastrar'),'success',4500);
+    await carregarEquipes();
+    renderTeamBody();
+  }catch(err){showToast('Erro ao convidar: '+err.message,'error',5000);}
+}
+
+async function removerMembro(memberId,teamId){
+  try{
+    const{error}=await sb.from('team_members').delete().eq('id',memberId);
+    if(error)throw error;
+    showToast('Membro removido','success');
+    await carregarEquipes(); renderTeamBody();
+  }catch(err){showToast('Erro: '+err.message,'error');}
+}
+
+function excluirEquipe(teamId){
+  const t=TEAMS.find(x=>x.id===teamId);
+  abrirConfirm('Excluir equipe','Remove a equipe "'+(t?t.nome:'')+'" e seus membros. As demandas continuam existindo, mas perdem o vínculo com a equipe. Continuar?',async()=>{
+    try{
+      const{error}=await sb.from('teams').delete().eq('id',teamId);
+      if(error)throw error;
+      closeConfirm();
+      showToast('Equipe excluída','success');
+      await carregarEquipes(); await carregarDemandas(); renderTeamBody();
+    }catch(err){showToast('Erro: '+err.message,'error');}
+  });
+}
+
+/* ---------- CONVITES PENDENTES (ao logar) ---------- */
+async function checarConvites(){
+  MY_INVITES=[];
+  try{
+    const myEmail=((PROFILE&&PROFILE.email)||USER.email||'').toLowerCase();
+    const{data,error}=await sb.from('team_members').select('*').eq('status','pending');
+    if(error)throw error;
+    const mine=(data||[]).filter(m=>(m.user_id===USER.id)||((m.email||'').toLowerCase()===myEmail));
+    if(mine.length){
+      const ids=[...new Set(mine.map(m=>m.team_id))];
+      let tmap={};
+      try{ const{data:ts}=await sb.from('teams').select('id,nome,owner_id').in('id',ids);
+        (ts||[]).forEach(t=>tmap[t.id]=t); }catch(e){}
+      MY_INVITES=mine.map(m=>({...m,team:tmap[m.team_id]||null}));
+    }
+  }catch(err){ console.warn('Convites indisponíveis:',err.message); }
+  atualizarBadgeEquipe();
+  if(MY_INVITES.length){ renderInvites(); document.getElementById('modal-invites').classList.add('show'); }
+}
+function renderInvites(){
+  document.getElementById('invites-body').innerHTML=MY_INVITES.map(m=>{
+    const nomeEquipe=m.team?m.team.nome:'(equipe)';
+    return `<div class="invite-card">
+      <p>Você foi convidado para a equipe <b>${esc(nomeEquipe)}</b>. Ao aceitar, poderá receber e colaborar em demandas do time.</p>
+      <div class="actions">
+        <button class="btn btn-primary btn-sm" onclick="aceitarConvite('${m.id}')">Aceitar e entrar</button>
+        <button class="btn btn-ghost btn-sm" onclick="recusarConvite('${m.id}')">Recusar</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+function closeInvites(){document.getElementById('modal-invites').classList.remove('show');}
+async function aceitarConvite(memberId){
+  try{
+    const{error}=await sb.from('team_members').update({status:'accepted',user_id:USER.id,nome:(PROFILE&&PROFILE.nome)||null}).eq('id',memberId);
+    if(error)throw error;
+    showToast('Você entrou na equipe ✔','success');
+    MY_INVITES=MY_INVITES.filter(m=>m.id!==memberId);
+    renderInvites(); atualizarBadgeEquipe();
+    if(!MY_INVITES.length) closeInvites();
+    await carregarEquipes(); await carregarDemandas();
+  }catch(err){showToast('Erro: '+err.message,'error',5000);}
+}
+async function recusarConvite(memberId){
+  try{
+    const{error}=await sb.from('team_members').update({status:'declined',user_id:USER.id}).eq('id',memberId);
+    if(error)throw error;
+    showToast('Convite recusado','success');
+    MY_INVITES=MY_INVITES.filter(m=>m.id!==memberId);
+    renderInvites(); atualizarBadgeEquipe();
+    if(!MY_INVITES.length) closeInvites();
+  }catch(err){showToast('Erro: '+err.message,'error');}
+}
+
+/* ---------- APROVAÇÃO DE ATRIBUIÇÃO (ao logar) ---------- */
+async function checarAtribuicoes(){
+  PENDING_ASSIGN=DEMANDAS.filter(d=>d.assigned_to===USER.id && d.assignment_status==='pending' && !d.is_archived);
+  atualizarBadgeEquipe();
+  if(PENDING_ASSIGN.length){ renderAssign(); document.getElementById('modal-assign').classList.add('show'); }
+}
+function renderAssign(){
+  document.getElementById('assign-body').innerHTML=PENDING_ASSIGN.map(d=>{
+    const criador=MEMBER_PROFILES[d.created_by]||MEMBER_PROFILES[d.user_id];
+    const quem=(criador&&criador.nome)||'Um colega';
+    return `<div class="invite-card">
+      <p><b>${esc(quem)}</b> atribuiu esta demanda a você:<br>"${esc((d.descricao||'').slice(0,140))}"<br>
+      <small style="color:var(--text-secondary)">${esc(d.tipo_demanda||'')} · prioridade ${esc(d.prioridade||'')}${d.data_prevista_saida?' · prazo '+fmtData(d.data_prevista_saida):''}</small></p>
+      <div class="actions">
+        <button class="btn btn-primary btn-sm" onclick="aprovarAtribuicao('${d.id}')">Aprovar</button>
+        <button class="btn btn-ghost btn-sm" onclick="recusarAtribuicao('${d.id}')">Recusar</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+function closeAssign(){document.getElementById('modal-assign').classList.remove('show');}
+async function aprovarAtribuicao(id){
+  try{
+    const{error}=await sb.from('demandas').update({assignment_status:'approved'}).eq('id',id);
+    if(error)throw error;
+    showToast('Atribuição aprovada — sua foto aparece no card ✔','success',4000);
+    PENDING_ASSIGN=PENDING_ASSIGN.filter(d=>d.id!==id);
+    renderAssign(); atualizarBadgeEquipe();
+    if(!PENDING_ASSIGN.length) closeAssign();
+    await carregarDemandas();
+  }catch(err){showToast('Erro: '+err.message,'error',5000);}
+}
+async function recusarAtribuicao(id){
+  try{
+    const{error}=await sb.from('demandas').update({assignment_status:'declined'}).eq('id',id);
+    if(error)throw error;
+    showToast('Atribuição recusada','success');
+    PENDING_ASSIGN=PENDING_ASSIGN.filter(d=>d.id!==id);
+    renderAssign(); atualizarBadgeEquipe();
+    if(!PENDING_ASSIGN.length) closeAssign();
+    await carregarDemandas();
+  }catch(err){showToast('Erro: '+err.message,'error');}
+}
+
+/* ---------- Atribuir no modal de demanda (membros da equipe escolhida) ---------- */
+function atualizarMembrosAtribuir(){
+  const teamId=document.getElementById('d-team').value;
+  const wrap=document.getElementById('d-assign-wrap');
+  const sel=document.getElementById('d-assigned');
+  if(!teamId){ wrap.style.display='none'; sel.innerHTML='<option value="">— ninguém —</option>'; return; }
+  const t=TEAMS.find(x=>x.id===teamId);
+  const membros=t?(t.members||[]).filter(m=>m.status==='accepted'&&m.user_id):[];
+  wrap.style.display='block';
+  const atual=sel.value;
+  sel.innerHTML='<option value="">— ninguém —</option>'+membros.map(m=>{
+    const prof=MEMBER_PROFILES[m.user_id];
+    const nome=m.nome||(prof&&prof.nome)||m.email;
+    return `<option value="${esc(m.user_id)}" data-email="${esc(m.email)}" data-nome="${esc(nome)}">${esc(nome)}${m.user_id===USER.id?' (você)':''}</option>`;
+  }).join('');
+  if(atual)sel.value=atual;
+}
+
+/* ============================================================
    CARREGAR DEMANDAS
    ============================================================ */
 async function carregarTudo(){
@@ -1227,6 +1658,25 @@ const IC={
   flag:'<svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M5 21V4h11l-1.5 4L16 12H5"/><path d="M5 4v17" fill="none"/></svg>',
   flagOff:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21V4h11l-1.5 4L16 12H5"/></svg>'
 };
+// Itens 3/4/5 — bloco do responsável atribuído: foto = aprovado/ciente; selo = falta aprovar
+function assigneeHTML(d){
+  if(!d.assigned_to) return '';
+  const prof=MEMBER_PROFILES[d.assigned_to];
+  const nome=d.responsavel||(prof&&prof.nome)||d.assigned_email||'Responsável';
+  const inicial=(nome||'?').trim().charAt(0).toUpperCase();
+  const st=d.assignment_status||'pending';
+  const foto=(st==='approved'&&prof&&prof.avatar_url)?`<img src="${esc(prof.avatar_url)}">`:esc(inicial);
+  const check=st==='approved'?`<span class="a-check">${IC.check}</span>`:'';
+  const flag={pending:'<span class="assign-flag pending">falta aprovar</span>',
+              approved:'<span class="assign-flag approved">aprovado ✓</span>',
+              declined:'<span class="assign-flag declined">recusou</span>'}[st]||'';
+  const sub={pending:'aguardando aprovação do responsável',approved:'faz parte desta demanda',declined:'não aceitou a demanda'}[st]||'';
+  return `<div class="assignee ${st}">
+    <div class="a-ava">${foto}${check}</div>
+    <div class="a-txt"><b>${esc(nome)}</b>${esc(sub)}</div>
+    ${flag}
+  </div>`;
+}
 function cardHTML(d){
   const late=estaAtrasada(d);
   const dias=diasEntre(d.data_input,hojeISO());
@@ -1247,7 +1697,13 @@ function cardHTML(d){
       <button class="move-btn" ${podePrev?'':'disabled'} onclick="moverStatus('${d.id}',-1)" title="${podePrev?'Mover para: '+esc(ordem[idx-1]):'Início do pipeline'}">${IC.left} ${podePrev?esc(ordem[idx-1]):'—'}</button>
       <button class="move-btn" ${podeNext?'':'disabled'} onclick="moverStatus('${d.id}',1)" title="${podeNext?'Mover para: '+esc(ordem[idx+1]):'Fim do pipeline'}">${podeNext?esc(ordem[idx+1]):'—'} ${IC.right}</button>
     </div>` : '';
-  return `<div class="card prio-${esc(d.prioridade)} ${late?'late':''} ${flagged?'flagged':''}">
+  // Item 5 — atalho do histórico de movimentações
+  const mv=Array.isArray(d.movimentacoes)?d.movimentacoes:[];
+  const ultNota=mv.length&&mv[mv.length-1].nota?mv[mv.length-1].nota:'';
+  const moveHint=mv.length?`<div class="c-moves-hint" onclick="openModal('${d.id}')" title="Ver histórico de movimentações">${IC.clock} ${mv.length} movimentação${mv.length>1?'ões':''}${ultNota?' · “'+esc(ultNota.slice(0,42))+(ultNota.length>42?'…':'')+'”':''}</div>`:'';
+  // Itens 3/4 — selo de pendência de aprovação do responsável
+  const assignPending = d.assigned_to && d.assignment_status==='pending';
+  return `<div class="card prio-${esc(d.prioridade)} ${late?'late':''} ${flagged?'flagged':''} ${assignPending?'assign-pending':''}">
     <div class="c-top">
       <span class="tag tipo">${esc(d.tipo_demanda||'—')}</span>
       <span class="tag prio-${esc(d.prioridade)}">${esc(d.prioridade||'')}</span>
@@ -1258,14 +1714,16 @@ function cardHTML(d){
     <div class="c-meta">
       ${d.solicitante?`<div>${IC.user} Solicitante: <b>${esc(d.solicitante)}</b></div>`:''}
       ${d.destino_demanda?`<div>${IC.target} Destino: <b>${esc(d.destino_demanda)}</b></div>`:''}
-      ${d.responsavel?`<div>${IC.tool} Responsável: <b>${esc(d.responsavel)}</b></div>`:''}
+      ${d.responsavel&&!d.assigned_to?`<div>${IC.tool} Responsável: <b>${esc(d.responsavel)}</b></div>`:''}
     </div>
+    ${assigneeHTML(d)}
     <div class="c-dates">
       <span class="date-chip">${IC.inbox} ${fmtData(d.data_input)}</span>
       ${prazoChip}
       ${saidaChip}
     </div>
     ${d.updated_at?`<div class="c-changed">${IC.clock} Status alterado em ${fmtMudanca(d.updated_at)} · ${dias>=0?dias:0}d em aberto</div>`:''}
+    ${moveHint}
     ${tags.length?`<div class="c-tags">${tags.map(t=>`<span class="t">#${esc(t)}</span>`).join('')}</div>`:''}
     ${d.percentual_progresso?`<div class="progress"><i style="width:${Math.min(100,d.percentual_progresso)}%"></i></div>`:''}
     ${moverHTML}
@@ -1307,6 +1765,13 @@ function openModal(id){
   f.reset();
   document.getElementById('d-id').value='';
   document.getElementById('prog-val').textContent='0';
+  // popular equipes + resetar atribuição/movimentações
+  const teamSel=document.getElementById('d-team');
+  teamSel.innerHTML='<option value="">Pessoal (sem equipe)</option>'+TEAMS.map(t=>`<option value="${esc(t.id)}">${esc(t.nome)}</option>`).join('');
+  teamSel.value='';
+  document.getElementById('d-assign-wrap').style.display='none';
+  document.getElementById('d-assigned').innerHTML='<option value="">— ninguém —</option>';
+  document.getElementById('d-moves-section').style.display='none';
   if(id){
     const d=DEMANDAS.find(x=>x.id===id);if(!d)return;
     document.getElementById('modal-title').textContent='Editar Demanda';
@@ -1327,6 +1792,11 @@ function openModal(id){
     document.getElementById('d-tags').value=(d.tags||[]).join(', ');
     document.getElementById('d-progresso').value=d.percentual_progresso||0;
     document.getElementById('prog-val').textContent=d.percentual_progresso||0;
+    // equipe + atribuição existentes
+    teamSel.value=d.team_id||'';
+    atualizarMembrosAtribuir();
+    if(d.assigned_to) document.getElementById('d-assigned').value=d.assigned_to;
+    renderMovesModal(d);
   }else{
     document.getElementById('modal-title').textContent='Nova Demanda';
     document.getElementById('d-data_input').value=hojeISO();
@@ -1337,6 +1807,19 @@ function openModal(id){
   m.classList.add('show');
 }
 function closeModal(){document.getElementById('modal-demanda').classList.remove('show');}
+// Histórico de movimentações no modal de edição (somente leitura)
+function renderMovesModal(d){
+  const sec=document.getElementById('d-moves-section');
+  const list=document.getElementById('d-moves-list');
+  const mv=Array.isArray(d.movimentacoes)?d.movimentacoes:[];
+  if(!mv.length){ sec.style.display='none'; return; }
+  sec.style.display='block';
+  list.innerHTML=mv.slice().reverse().map(x=>{
+    const quem=x.por_nome||'alguém';
+    const nota=x.nota?` — <span class="mv-note">"${esc(x.nota)}"</span>`:'';
+    return `<div class="mv"><b>${esc(x.de||'?')} → ${esc(x.para||'?')}</b> · ${esc(quem)} · ${esc(fmtMudanca(x.em))}${nota}</div>`;
+  }).join('');
+}
 
 async function salvarDemanda(){
   const id=document.getElementById('d-id').value;
@@ -1364,6 +1847,30 @@ async function salvarDemanda(){
     percentual_progresso:parseInt(document.getElementById('d-progresso').value)||0
   };
 
+  // ---- Equipe + atribuição de responsável ----
+  const teamId=document.getElementById('d-team').value||null;
+  const assignedSel=document.getElementById('d-assigned');
+  const assignedId=assignedSel.value||null;
+  payload.team_id=teamId;
+  if(assignedId){
+    const opt=assignedSel.options[assignedSel.selectedIndex];
+    payload.assigned_to=assignedId;
+    payload.assigned_email=opt?opt.getAttribute('data-email'):null;
+    const nomeResp=opt?opt.getAttribute('data-nome'):null;
+    if(nomeResp) payload.responsavel=nomeResp;   // sincroniza nome exibido
+    // mantém aprovação anterior se o responsável não mudou; senão, pendente
+    const prev=id?DEMANDAS.find(x=>x.id===id):null;
+    if(prev && prev.assigned_to===assignedId && prev.assignment_status && prev.assignment_status!=='none'){
+      payload.assignment_status=prev.assignment_status;
+    }else{
+      payload.assignment_status=(assignedId===USER.id)?'approved':'pending';
+    }
+  }else{
+    payload.assigned_to=null;
+    payload.assigned_email=null;
+    payload.assignment_status='none';
+  }
+
   const btn=document.getElementById('save-btn');btn.disabled=true;btn.textContent='Salvando...';
   try{
     if(id){
@@ -1372,9 +1879,10 @@ async function salvarDemanda(){
       showToast('Demanda atualizada','success');
     }else{
       payload.user_id=USER.id;
+      payload.created_by=USER.id;
       const{error}=await sb.from('demandas').insert(payload);
       if(error)throw error;
-      showToast('Demanda criada','success');
+      showToast(payload.assignment_status==='pending'?'Demanda criada e enviada para aprovação do responsável':'Demanda criada','success');
     }
     closeModal();
     await carregarDemandas();
@@ -1396,21 +1904,40 @@ async function concluirDemanda(id){
 /* Item 4/5 — move a demanda para o status anterior/seguinte do pipeline com 1 clique.
    O updated_at é atualizado automaticamente pelo trigger (data da mudança de status).
    Ao chegar em "Concluído", a data real de conclusão é preenchida automaticamente. */
-async function moverStatus(id,dir){
+function moverStatus(id,dir){
   const d=DEMANDAS.find(x=>x.id===id); if(!d)return;
   const ordem=pipelineOrdem();
   const idx=ordem.indexOf(d.status);
   const novo=ordem[idx+dir];
   if(!novo)return;
-  const payload={status:novo};
+  abrirMoveNote(d,novo);   // pede a anotação (opcional) antes de mover
+}
+// Modal de anotação de movimentação (item 5 — registra cada movimento)
+function abrirMoveNote(d,novo){
+  document.getElementById('move-title').textContent='Mover para “'+novo+'”';
+  document.getElementById('move-note').value='';
+  document.getElementById('modal-move').classList.add('show');
+  setTimeout(()=>document.getElementById('move-note').focus(),60);
+  document.getElementById('move-confirm').onclick=()=>confirmarMove(d.id,novo);
+}
+function closeMove(){document.getElementById('modal-move').classList.remove('show');}
+async function confirmarMove(id,novo){
+  const d=DEMANDAS.find(x=>x.id===id); if(!d){closeMove();return;}
+  const nota=document.getElementById('move-note').value.trim();
+  const entrada={de:d.status,para:novo,por:USER.id,por_nome:(PROFILE&&PROFILE.nome)||USER.email,nota:nota||null,em:new Date().toISOString()};
+  const histAtual=Array.isArray(d.movimentacoes)?d.movimentacoes:[];
+  const payload={status:novo, movimentacoes:[...histAtual,entrada]};
   if(novo==='Concluído'){ payload.data_saida=hojeISO(); payload.percentual_progresso=100; }
-  else if(d.status==='Concluído'){ payload.data_saida=null; } // saiu de concluído -> limpa data real
+  else if(d.status==='Concluído'){ payload.data_saida=null; }   // saiu de concluído -> limpa data real
+  const btn=document.getElementById('move-confirm'); btn.disabled=true; btn.textContent='Movendo...';
   try{
     const{error}=await sb.from('demandas').update(payload).eq('id',id);
     if(error)throw error;
-    showToast('Movida para “'+novo+'”','success',2200);
+    closeMove();
+    showToast('Movida para “'+novo+'”'+(nota?' com anotação':''),'success',2400);
     await carregarDemandas();
-  }catch(err){showToast('Erro: '+err.message,'error');}
+  }catch(err){showToast('Erro: '+err.message,'error',5000);}
+  finally{ btn.disabled=false; btn.textContent='Mover'; }
 }
 /* Item 9 — liga/desliga a bandeira de importante (persistido no campo "origem"). */
 async function toggleFlag(id){
@@ -1467,7 +1994,7 @@ function closeConfirm(){document.getElementById('modal-confirm').classList.remov
 /* Item 3 — o formulário de demanda (e os de perfil/config) NÃO fecham ao clicar fora,
    para evitar fechamento acidental. Só fecham pelos botões Cancelar/Salvar/Fechar.
    Apenas o diálogo de confirmação continua fechando ao clicar fora. */
-const NAO_FECHA_FORA=['modal-demanda','modal-config','modal-profile'];
+const NAO_FECHA_FORA=['modal-demanda','modal-config','modal-profile','modal-move'];
 document.querySelectorAll('.overlay').forEach(o=>o.addEventListener('click',e=>{
   if(e.target===o && !NAO_FECHA_FORA.includes(o.id)) o.classList.remove('show');
 }));
