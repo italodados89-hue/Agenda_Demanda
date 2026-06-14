@@ -451,6 +451,25 @@ label.field>span{display:block;font-size:12px;color:var(--text-secondary);margin
 .card .c-moves-hint{font-size:10px;color:var(--text-muted);margin-bottom:8px;display:flex;align-items:center;gap:5px;cursor:pointer}
 .card .c-moves-hint:hover{color:var(--text-secondary)}
 .card .c-moves-hint svg{width:11px;height:11px}
+
+/* ===================== TELEFONE (prefixo de país) ===================== */
+.phone-row{display:flex;gap:8px}
+.phone-row .phone-cc{flex:0 0 132px;width:132px;padding-right:28px;font-size:13px}
+.phone-row .phone-num{flex:1;min-width:0}
+.phone-hint{font-size:11px;color:var(--text-muted);margin:-2px 0 13px;min-height:14px;line-height:1.4}
+.phone-hint b{color:var(--text-secondary);font-weight:600}
+
+/* ===================== AVATAR DA EQUIPE (5 presets) ===================== */
+.team-ava-pick{display:flex;gap:9px;flex-wrap:wrap;margin:4px 0 10px}
+.team-ava-opt{width:46px;height:46px;border-radius:50%;border:2px solid var(--glass-border);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;overflow:hidden;transition:.16s;background:rgba(255,255,255,.04);padding:0}
+.team-ava-opt:hover{transform:translateY(-2px)}
+.team-ava-opt.sel{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-glow)}
+.team-ava-opt svg{width:100%;height:100%;display:block}
+.team-card .t-ava{width:34px;height:34px;border-radius:50%;flex-shrink:0;overflow:hidden;border:1px solid var(--glass-border)}
+.team-card .t-ava svg{width:100%;height:100%;display:block}
+.invite-card .ic-ava{width:30px;height:30px;border-radius:50%;overflow:hidden;flex-shrink:0;vertical-align:middle;display:inline-block}
+.invite-card .ic-ava svg{width:100%;height:100%}
 </style>
 </head>
 <body>
@@ -488,6 +507,14 @@ label.field>span{display:block;font-size:12px;color:var(--text-secondary);margin
         <label class="field"><span>E-mail *</span>
           <input class="input" type="email" id="su-email" placeholder="voce@email.com" autocomplete="email">
         </label>
+        <!-- ===== TELEFONE (WhatsApp) — obrigatório, prefixo de país das Américas ===== -->
+        <label class="field" style="margin-bottom:5px"><span>Telefone / WhatsApp *</span>
+          <div class="phone-row">
+            <select class="input phone-cc" id="su-ddi" onchange="atualizarDicaTelefone('su')"></select>
+            <input class="input phone-num" id="su-tel" inputmode="tel" placeholder="DDD + número" autocomplete="tel" oninput="formatarTelefone('su')">
+          </div>
+        </label>
+        <div class="phone-hint" id="su-tel-hint"></div>
         <label class="field"><span>Sexo</span>
           <div class="sexo-group">
             <label class="sexo-opt"><input type="radio" name="su-sexo" value="Masculino"><span>Masculino</span></label>
@@ -676,6 +703,13 @@ label.field>span{display:block;font-size:12px;color:var(--text-secondary);margin
     </div>
     <label class="field"><span>Nome</span><input class="input" id="pf-nome" placeholder="Seu nome"></label>
     <label class="field"><span>E-mail</span><input class="input" id="pf-email" disabled style="opacity:.6"></label>
+    <label class="field" style="margin-bottom:5px"><span>Telefone / WhatsApp</span>
+      <div class="phone-row">
+        <select class="input phone-cc" id="pf-ddi" onchange="atualizarDicaTelefone('pf')"></select>
+        <input class="input phone-num" id="pf-tel" inputmode="tel" placeholder="DDD + número" autocomplete="tel" oninput="formatarTelefone('pf')">
+      </div>
+    </label>
+    <div class="phone-hint" id="pf-tel-hint"></div>
     <label class="field"><span>Sexo</span>
       <div class="sexo-group">
         <label class="sexo-opt"><input type="radio" name="pf-sexo" value="Masculino"><span>Masculino</span></label>
@@ -780,6 +814,15 @@ const SUPABASE_ANON_KEY = 'sb_publishable_L5AD-PpdiAxsQytQK0HEzQ_9Hw8ZIu_';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 /* ============================================================
+   INTEGRAÇÃO N8N (notificações por WhatsApp + e-mail)
+   >>> Cole aqui a URL do WEBHOOK de produção do seu fluxo n8n.
+   Ex.: https://SEU-N8N.up.railway.app/webhook/pipeline-demandas
+   É só notificação: roda em segundo plano e NUNCA bloqueia o app.
+   Deixe vazio ('') para desligar as notificações.
+   ============================================================ */
+const N8N_WEBHOOK_URL = 'https://primary-production-1e9c2.up.railway.app/webhook/pipeline-demandas';
+
+/* ============================================================
    ESTADO GLOBAL
    ============================================================ */
 let USER = null;
@@ -817,6 +860,99 @@ const STATUS_COLORS = {
   'Entrada':'#5b8cff','Planejado':'#9b6bff','Em execução':'#4aa8ff',
   'Aguardando retorno':'#f5a524','Atrasado':'#ff5d6c','Concluído':'#22c79a','Arquivado':'#5b6478'
 };
+
+/* ============================================================
+   TELEFONE — países das Américas (Norte, Central e Sul)
+   ddi = código do país; ex = formato de exemplo (dica de preenchimento).
+   A lógica fica pequena focando só nas Américas, como pedido.
+   ============================================================ */
+const PAISES_AMERICA = [
+  {ddi:'55', flag:'🇧🇷', nome:'Brasil', ex:'11 91234-5678'},
+  {ddi:'1',  flag:'🇺🇸', nome:'EUA',    ex:'201 555-0123'},
+  {ddi:'1',  flag:'🇨🇦', nome:'Canadá', ex:'416 555-0123'},
+  {ddi:'52', flag:'🇲🇽', nome:'México', ex:'55 1234 5678'},
+  {ddi:'54', flag:'🇦🇷', nome:'Argentina', ex:'11 1234-5678'},
+  {ddi:'56', flag:'🇨🇱', nome:'Chile', ex:'9 1234 5678'},
+  {ddi:'57', flag:'🇨🇴', nome:'Colômbia', ex:'301 1234567'},
+  {ddi:'58', flag:'🇻🇪', nome:'Venezuela', ex:'412 1234567'},
+  {ddi:'51', flag:'🇵🇪', nome:'Peru', ex:'912 345 678'},
+  {ddi:'593',flag:'🇪🇨', nome:'Equador', ex:'99 123 4567'},
+  {ddi:'591',flag:'🇧🇴', nome:'Bolívia', ex:'71234567'},
+  {ddi:'595',flag:'🇵🇾', nome:'Paraguai', ex:'961 234567'},
+  {ddi:'598',flag:'🇺🇾', nome:'Uruguai', ex:'94 231 234'},
+  {ddi:'592',flag:'🇬🇾', nome:'Guiana', ex:'609 1234'},
+  {ddi:'597',flag:'🇸🇷', nome:'Suriname', ex:'741 1234'},
+  {ddi:'502',flag:'🇬🇹', nome:'Guatemala', ex:'5123 4567'},
+  {ddi:'503',flag:'🇸🇻', nome:'El Salvador', ex:'7123 4567'},
+  {ddi:'504',flag:'🇭🇳', nome:'Honduras', ex:'9123-4567'},
+  {ddi:'505',flag:'🇳🇮', nome:'Nicarágua', ex:'8123 4567'},
+  {ddi:'506',flag:'🇨🇷', nome:'Costa Rica', ex:'8312 3456'},
+  {ddi:'507',flag:'🇵🇦', nome:'Panamá', ex:'6123 4567'},
+  {ddi:'501',flag:'🇧🇿', nome:'Belize', ex:'612 3456'},
+  {ddi:'53', flag:'🇨🇺', nome:'Cuba', ex:'5 1234567'},
+  {ddi:'1',  flag:'🇩🇴', nome:'Rep. Dominicana', ex:'809 123 4567'},
+  {ddi:'1',  flag:'🇵🇷', nome:'Porto Rico', ex:'787 123 4567'}
+];
+// Preenche um <select> de DDI (país) — usado no cadastro e no perfil
+function preencherDDI(selId, ddiSelecionado){
+  const el=document.getElementById(selId); if(!el)return;
+  el.innerHTML=PAISES_AMERICA.map((p,i)=>`<option value="${i}" data-ddi="${p.ddi}">${p.flag} +${p.ddi} ${p.nome}</option>`).join('');
+  if(ddiSelecionado){
+    const idx=PAISES_AMERICA.findIndex(p=>p.ddi===String(ddiSelecionado));
+    if(idx>=0) el.value=idx;
+  }
+}
+// Mostra a dica de preenchimento (exemplo) conforme o país escolhido
+function atualizarDicaTelefone(prefixo){
+  const sel=document.getElementById(prefixo+'-ddi');
+  const hint=document.getElementById(prefixo+'-tel-hint');
+  if(!sel||!hint)return;
+  const p=PAISES_AMERICA[parseInt(sel.value)||0]||PAISES_AMERICA[0];
+  hint.innerHTML=`Ex.: <b>+${p.ddi} ${p.ex}</b> — digite o DDD/área e o número (sem o +${p.ddi}).`;
+}
+// Mantém só dígitos no campo do número, conforme o usuário digita
+function formatarTelefone(prefixo){
+  const inp=document.getElementById(prefixo+'-tel');
+  if(!inp)return;
+  inp.value=inp.value.replace(/[^\d\s().-]/g,'');
+}
+// Monta o telefone final em E.164 só com dígitos (ddi + número) — ex.: 5511912345678
+function montarTelefoneE164(prefixo){
+  const sel=document.getElementById(prefixo+'-ddi');
+  const inp=document.getElementById(prefixo+'-tel');
+  if(!sel||!inp)return '';
+  const p=PAISES_AMERICA[parseInt(sel.value)||0]||PAISES_AMERICA[0];
+  let num=(inp.value||'').replace(/\D/g,'');
+  if(!num)return '';
+  // Se a pessoa já colou o DDI na frente, não duplica
+  if(num.startsWith(p.ddi)) return num;
+  return p.ddi+num;
+}
+// Recupera DDI + número nacional a partir de um E.164 salvo, p/ reabrir no perfil
+function separarTelefone(e164){
+  const digits=(e164||'').replace(/\D/g,'');
+  if(!digits)return {idx:0,nacional:''};
+  // Tenta casar o DDI mais longo primeiro (ex.: 593 antes de 59)
+  const ordenados=PAISES_AMERICA.map((p,i)=>({i,ddi:p.ddi})).sort((a,b)=>b.ddi.length-a.ddi.length);
+  for(const o of ordenados){
+    if(digits.startsWith(o.ddi)) return {idx:o.i,nacional:digits.slice(o.ddi.length)};
+  }
+  return {idx:0,nacional:digits};
+}
+
+/* ============================================================
+   AVATARES DE EQUIPE — 5 figuras clássicas, leves e distintas.
+   Guardamos só o id ('av1'..'av5') no banco; o SVG fica aqui.
+   ============================================================ */
+const TEAM_AVATARS = {
+  av1:`<svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg"><circle cx="24" cy="24" r="24" fill="#1e3a8a"/><path d="M24 9l3.6 7.6 8.4 1-6 6 1.5 8.4L24 35.4 16.5 32 18 23.6l-6-6 8.4-1z" fill="#facc15"/></svg>`,
+  av2:`<svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg"><circle cx="24" cy="24" r="24" fill="#0f766e"/><path d="M24 10c8 4 11 9 11 16 0 6-5 11-11 12-6-1-11-6-11-12 0-7 3-12 11-16z" fill="#5eead4"/><circle cx="24" cy="25" r="4" fill="#0f766e"/></svg>`,
+  av3:`<svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg"><circle cx="24" cy="24" r="24" fill="#9a3412"/><path d="M24 11l11 6v9c0 7-5 11-11 13-6-2-11-6-11-13v-9z" fill="#fdba74"/><path d="M19 24l3.5 3.5L30 20" fill="none" stroke="#9a3412" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  av4:`<svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg"><circle cx="24" cy="24" r="24" fill="#6d28d9"/><circle cx="24" cy="24" r="12" fill="none" stroke="#ddd6fe" stroke-width="3"/><path d="M24 16l2.5 5.5 5.5.8-4 4 1 5.6-5-2.7-5 2.7 1-5.6-4-4 5.5-.8z" fill="#ddd6fe"/></svg>`,
+  av5:`<svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg"><circle cx="24" cy="24" r="24" fill="#b91c1c"/><path d="M24 12c-2 6-6 7-10 7 0 9 4 14 10 17 6-3 10-8 10-17-4 0-8-1-10-7z" fill="#fecaca"/><path d="M24 18v12M18 24h12" stroke="#b91c1c" stroke-width="3" stroke-linecap="round"/></svg>`
+};
+const TEAM_AVATAR_IDS = Object.keys(TEAM_AVATARS);
+function teamAvatarSVG(id){ return TEAM_AVATARS[id] || TEAM_AVATARS.av1; }
 
 /* ============================================================
    HELPERS
@@ -862,6 +998,152 @@ function venceEm2Dias(d){
 }
 
 /* ============================================================
+   NOTIFICAÇÕES N8N (WhatsApp + e-mail)
+   ------------------------------------------------------------
+   • notificarN8N(): dispara o webhook em segundo plano (fire-and-forget),
+     NUNCA bloqueia o app e NUNCA quebra o salvamento (try/catch + sem await).
+   • destinatariosDemanda(): resolve QUEM recebe, respeitando o vínculo da
+     demanda (criador / responsável / membros aceitos da equipe). É o mesmo
+     "travamento" do RLS: só quem faz parte da demanda recebe.
+   • dispararNotificacao(): monta a mensagem pronta por destinatário e envia.
+   O n8n só recebe e repassa (sem IA): texto p/ WhatsApp e HTML p/ e-mail.
+   ============================================================ */
+function dataBR(iso){ if(!iso)return '—'; const[a,m,d]=String(iso).split('-'); return (d&&m&&a)?`${d}/${m}/${a}`:iso; }
+
+// Envia o payload ao webhook do n8n sem travar a interface
+function notificarN8N(payload){
+  try{
+    if(!N8N_WEBHOOK_URL || /SEU-N8N/.test(N8N_WEBHOOK_URL)) return; // ainda não configurado
+    // text/plain = "simple request": evita preflight CORS. O n8n lê o body mesmo assim.
+    fetch(N8N_WEBHOOK_URL,{
+      method:'POST',
+      headers:{'Content-Type':'text/plain;charset=UTF-8'},
+      body:JSON.stringify(payload),
+      keepalive:true
+    }).catch(()=>{}); // silencioso: notificação nunca atrapalha o uso
+  }catch(e){ /* ignora */ }
+}
+
+// Acrescenta um destinatário único (dedup por user/email/telefone)
+function _addDest(map, uid, papel){
+  if(!uid) return;
+  let p = MEMBER_PROFILES[uid];
+  if(!p && uid===USER.id && PROFILE) p={nome:PROFILE.nome,email:PROFILE.email,telefone:PROFILE.telefone};
+  if(!p) return;
+  const tel=(p.telefone||'').replace(/\D/g,'');
+  const email=(p.email||'').trim();
+  if(!tel && !email) return;
+  const key=uid;
+  if(map[key]){ if(!map[key].papeis.includes(papel)) map[key].papeis.push(papel); return; }
+  map[key]={ user_id:uid, nome:p.nome||email||'Usuário', email, telefone:tel, papeis:[papel] };
+}
+// Resolve a lista de destinatários conforme o vínculo da demanda
+function destinatariosDemanda(d, {criador=true, responsavel=true, equipe=true}={}){
+  const map={};
+  if(criador) _addDest(map, d.user_id||d.created_by, 'criador');
+  if(responsavel && d.assigned_to && d.assignment_status!=='declined') _addDest(map, d.assigned_to, 'responsável');
+  if(equipe && d.team_id){
+    const t=TEAMS.find(x=>x.id===d.team_id);
+    if(t)(t.members||[]).filter(m=>m.status==='accepted'&&m.user_id).forEach(m=>_addDest(map, m.user_id, 'membro da equipe'));
+  }
+  return Object.values(map);
+}
+
+// Modelo de e-mail (HTML simples e corporativo)
+function _htmlEmail(titulo, corpoLinhas, destaque){
+  const cor=destaque||'#5b8cff';
+  const linhas=corpoLinhas.map(l=>`<tr><td style="padding:5px 0;color:#5b6478;font-size:13px;width:130px;vertical-align:top">${l[0]}</td><td style="padding:5px 0;color:#1a2233;font-size:13px;font-weight:600">${l[1]}</td></tr>`).join('');
+  return `<div style="font-family:Arial,Helvetica,sans-serif;max-width:560px;margin:0 auto;border:1px solid #e6e9f0;border-radius:14px;overflow:hidden">
+    <div style="background:${cor};padding:16px 22px;color:#fff;font-size:16px;font-weight:700">Pipeline de Demandas Ítalo</div>
+    <div style="padding:20px 22px">
+      <div style="font-size:15px;font-weight:700;color:#1a2233;margin-bottom:14px">${titulo}</div>
+      <table style="width:100%;border-collapse:collapse">${linhas}</table>
+    </div>
+    <div style="padding:12px 22px;background:#f7f9fc;color:#8a93a6;font-size:11px;border-top:1px solid #e6e9f0">Mensagem automática • você faz parte desta demanda.</div>
+  </div>`;
+}
+
+// Monta {mensagem, assunto, html} personalizados por evento e papel
+function _conteudoNotificacao(evento, d, ator, papeis, extra){
+  const tipo=d.tipo_demanda||'Demanda';
+  const desc=(d.descricao||'').slice(0,160);
+  const prio=d.prioridade||'Normal';
+  const prazo=d.data_prevista_saida?dataBR(d.data_prevista_saida):'sem prazo';
+  const equipeNome=(()=>{const t=d.team_id?TEAMS.find(x=>x.id===d.team_id):null; return t?t.nome:null;})();
+  const papelTxt=papeis.includes('criador')?'criador':papeis[0];
+  let titulo, msg, cor='#5b8cff';
+  const base=[['Tipo',tipo],['Descrição',desc],['Prioridade',prio],['Status',d.status||'—'],['Prazo',prazo]];
+  if(equipeNome) base.push(['Equipe',equipeNome]);
+
+  if(evento==='demanda_criada'){
+    titulo='✅ Nova demanda criada'; cor='#22a06b';
+    msg=`✅ *Nova demanda criada*\n\n*${tipo}* — ${desc}\nPrioridade: ${prio}\nStatus: ${d.status}\nPrazo: ${prazo}`+
+        (papeis.includes('criador')?`\n\nVocê criou esta demanda.`:`\n\n${ator} criou e atribuiu a você.`);
+  }else if(evento==='demanda_atribuida'){
+    titulo='👤 Você foi adicionado a uma demanda'; cor='#9b6bff';
+    msg=`👤 *Você foi adicionado a uma demanda*\n\n${ator} atribuiu a você:\n*${tipo}* — ${desc}\nPrioridade: ${prio}\nPrazo: ${prazo}`+
+        `\n\nAbra o Pipeline para aprovar e acompanhar.`;
+  }else if(evento==='convite_equipe'){
+    titulo='👥 Convite de equipe'; cor='#4aa8ff';
+    msg=`👥 *Convite de equipe*\n\n${ator} convidou você para a equipe *${extra.equipe||''}*.\nAo aceitar, você passa a receber e colaborar nas demandas do time.`;
+    return {mensagem:msg, assunto:`Convite para a equipe ${extra.equipe||''} — Pipeline de Demandas`,
+            html:_htmlEmail(titulo,[['Equipe',extra.equipe||'—'],['Convidado por',ator]],cor)};
+  }else{ // status_alterado / concluida / arquivada
+    const de=extra.de||'—', para=extra.para||d.status;
+    titulo='🔄 Status atualizado'; cor='#f5a524';
+    if(para==='Concluído'){titulo='🏁 Demanda concluída';cor='#22a06b';}
+    if(para==='Arquivado'){titulo='📦 Demanda arquivada';cor='#5b6478';}
+    msg=`🔄 *${titulo.replace(/^[^ ]+ /,'')}*\n\n*${tipo}* — ${desc}\n${de} → *${para}*\nPor: ${ator}`+
+        (extra.nota?`\n📝 ${extra.nota}`:'')+
+        (papelTxt==='criador'?`\n\nVocê criou esta demanda.`:`\n\nVocê faz parte desta demanda (${papelTxt}).`);
+    base[3]=['Mudança',`${de} → ${para}`];
+    if(extra.nota) base.push(['Anotação',extra.nota]);
+  }
+  return {mensagem:msg, assunto:`${titulo} — ${tipo}`, html:_htmlEmail(titulo,base,cor)};
+}
+
+// Dispara a notificação do evento para todos os destinatários pertinentes
+function dispararNotificacao(evento, d, extra={}){
+  try{
+    let dests;
+    if(evento==='demanda_criada')      dests=destinatariosDemanda(d,{criador:true,responsavel:true,equipe:false});
+    else if(evento==='demanda_atribuida') dests=destinatariosDemanda(d,{criador:false,responsavel:true,equipe:false});
+    else                                dests=destinatariosDemanda(d,{criador:true,responsavel:true,equipe:true}); // status/conclui/arquiva
+    if(!dests.length) return;
+    const ator=(PROFILE&&PROFILE.nome)||(USER&&USER.email)||'Sistema';
+    const destinatarios=dests.map(r=>{
+      const c=_conteudoNotificacao(evento,d,ator,r.papeis,extra);
+      return {nome:r.nome,email:r.email,telefone:r.telefone,papel:r.papeis.join(', '),
+              mensagem:c.mensagem,assunto:c.assunto,html:c.html};
+    });
+    notificarN8N({
+      app:'Pipeline de Demandas Ítalo',
+      evento,
+      ator,
+      demanda:{ id:d.id||null, tipo:d.tipo_demanda||null, descricao:d.descricao||null,
+                prioridade:d.prioridade||null, status:d.status||null,
+                prazo:d.data_prevista_saida||null, team_id:d.team_id||null },
+      destinatarios
+    });
+  }catch(e){ console.warn('Notificação não enviada:',e); }
+}
+// Notifica um convite de equipe por e-mail/WhatsApp (item 2.1)
+function dispararConviteEquipe(emailConvidado, achado, nomeEquipe){
+  try{
+    const tel=achado&&achado.telefone?String(achado.telefone).replace(/\D/g,''):'';
+    if(!emailConvidado && !tel) return;
+    const ator=(PROFILE&&PROFILE.nome)||(USER&&USER.email)||'Sistema';
+    const c=_conteudoNotificacao('convite_equipe',{},ator,['convidado'],{equipe:nomeEquipe});
+    notificarN8N({
+      app:'Pipeline de Demandas Ítalo', evento:'convite_equipe', ator,
+      demanda:{ equipe:nomeEquipe },
+      destinatarios:[{nome:(achado&&achado.nome)||emailConvidado,email:emailConvidado||'',telefone:tel,
+                      papel:'convidado',mensagem:c.mensagem,assunto:c.assunto,html:c.html}]
+    });
+  }catch(e){ console.warn('Convite não notificado:',e); }
+}
+
+/* ============================================================
    AUTENTICAÇÃO
    ============================================================ */
 // Alterna entre as abas Entrar / Criar conta / Admin
@@ -900,17 +1182,19 @@ async function doSignup(){
   const nome=document.getElementById('su-nome').value.trim();
   const email=document.getElementById('su-email').value.trim();
   const sexo=(document.querySelector('input[name="su-sexo"]:checked')||{}).value||'Não informar';
+  const telefone=montarTelefoneE164('su');   // obrigatório (item 1)
   const p1=document.getElementById('su-pass').value;
   const p2=document.getElementById('su-pass2').value;
   if(!nome){authMsg('Informe seu nome.');return;}
   if(!email){authMsg('Informe seu e-mail.');return;}
+  if(!telefone || telefone.replace(/\D/g,'').length<8){authMsg('Informe um telefone/WhatsApp válido (com DDD e número).');return;}
   if(p1.length<6){authMsg('A senha precisa ter ao menos 6 caracteres.');return;}
   if(p1!==p2){authMsg('As senhas não coincidem.');return;}
   const btn=document.getElementById('su-btn');btn.disabled=true;btn.textContent='Criando...';
   try{
     const{data,error}=await sb.auth.signUp({
       email,password:p1,
-      options:{data:{nome,sexo}}   // vira raw_user_meta_data -> trigger cria o profile
+      options:{data:{nome,sexo,telefone}}   // vira raw_user_meta_data -> trigger cria o profile
     });
     if(error)throw error;
     const ehAdmin = email.toLowerCase()===ADMIN_EMAIL;
@@ -1073,6 +1357,12 @@ function openProfile(){
   if(!PROFILE)return;
   document.getElementById('pf-nome').value=PROFILE.nome||'';
   document.getElementById('pf-email').value=PROFILE.email||USER.email||'';
+  // Telefone: separa DDI + número nacional a partir do salvo
+  const tel=separarTelefone(PROFILE.telefone||'');
+  preencherDDI('pf-ddi');
+  document.getElementById('pf-ddi').value=tel.idx;
+  document.getElementById('pf-tel').value=tel.nacional;
+  atualizarDicaTelefone('pf');
   const sx=PROFILE.sexo||'Não informar';
   const r=document.querySelector(`input[name="pf-sexo"][value="${sx}"]`);
   if(r)r.checked=true;
@@ -1117,11 +1407,12 @@ async function enviarAvatar(ev){
 async function salvarPerfil(){
   const nome=document.getElementById('pf-nome').value.trim();
   const sexo=(document.querySelector('input[name="pf-sexo"]:checked')||{}).value||'Não informar';
+  const telefone=montarTelefoneE164('pf')||null;
   const btn=document.getElementById('pf-save');btn.disabled=true;btn.textContent='Salvando...';
   try{
-    const{error}=await sb.from('profiles').update({nome,sexo}).eq('id',USER.id);
+    const{error}=await sb.from('profiles').update({nome,sexo,telefone}).eq('id',USER.id);
     if(error)throw error;
-    PROFILE.nome=nome;PROFILE.sexo=sexo;
+    PROFILE.nome=nome;PROFILE.sexo=sexo;PROFILE.telefone=telefone;
     document.getElementById('user-email').textContent=nome||USER.email;
     pintarAvatarTopbar();
     showToast('Perfil salvo','success');
@@ -1252,11 +1543,11 @@ async function carregarEquipes(){
 // Perfis visíveis (eu + colegas de equipe) -> usados para mostrar foto/nome no card
 async function carregarPerfisVisiveis(){
   MEMBER_PROFILES={};
-  if(PROFILE) MEMBER_PROFILES[USER.id]={nome:PROFILE.nome,email:PROFILE.email,avatar_url:PROFILE.avatar_url};
+  if(PROFILE) MEMBER_PROFILES[USER.id]={nome:PROFILE.nome,email:PROFILE.email,avatar_url:PROFILE.avatar_url,telefone:PROFILE.telefone};
   try{
-    const{data,error}=await sb.from('profiles').select('id,nome,email,avatar_url');
+    const{data,error}=await sb.from('profiles').select('id,nome,email,avatar_url,telefone');
     if(error)throw error;
-    (data||[]).forEach(p=>{MEMBER_PROFILES[p.id]={nome:p.nome,email:p.email,avatar_url:p.avatar_url};});
+    (data||[]).forEach(p=>{MEMBER_PROFILES[p.id]={nome:p.nome,email:p.email,avatar_url:p.avatar_url,telefone:p.telefone};});
   }catch(err){ console.warn('Perfis de equipe indisponíveis:',err.message); }
 }
 function atualizarBadgeEquipe(){
@@ -1298,6 +1589,7 @@ function renderTeamBody(){
     }).join('');
     return `<div class="team-card">
       <div class="t-head">
+        <div class="t-ava">${teamAvatarSVG(t.avatar)}</div>
         <h4>${esc(t.nome)}</h4>
         <span class="${souDono?'t-owner':'t-member'}">${souDono?'Você é dono':'Membro'}</span>
         ${souDono?`<button class="icon-btn" onclick="excluirEquipe('${t.id}')" title="Excluir equipe" style="color:var(--danger);padding:5px">${IC.trash}</button>`:''}
@@ -1311,12 +1603,25 @@ function renderTeamBody(){
   }).join('');
   html+=`<div class="team-create">
     <h4>➕ Criar nova equipe</h4>
+    <div style="font-size:11.5px;color:var(--text-secondary);font-weight:600;margin-bottom:4px">Avatar da equipe (ajuda na identificação visual)</div>
+    <div class="team-ava-pick" id="team-ava-pick">
+      ${TEAM_AVATAR_IDS.map((id,i)=>`<button type="button" class="team-ava-opt${i===0?' sel':''}" data-av="${id}" onclick="selecionarAvatarEquipe('${id}')" title="Avatar ${i+1}">${teamAvatarSVG(id)}</button>`).join('')}
+    </div>
     <div class="invite-row">
       <input class="input" id="team-new-name" placeholder="Nome da equipe (ex.: Contratos LATAM)" onkeydown="if(event.key==='Enter'){event.preventDefault();criarEquipe()}">
       <button class="btn btn-primary btn-sm" onclick="criarEquipe()">Criar</button>
     </div>
   </div>`;
   body.innerHTML=html;
+  _avatarEquipeSel='av1';   // padrão ao reabrir o painel
+}
+// Guarda o avatar escolhido para a nova equipe e destaca a opção
+let _avatarEquipeSel='av1';
+function selecionarAvatarEquipe(id){
+  _avatarEquipeSel=id;
+  document.querySelectorAll('#team-ava-pick .team-ava-opt').forEach(b=>{
+    b.classList.toggle('sel', b.getAttribute('data-av')===id);
+  });
 }
 
 async function criarEquipe(){
@@ -1324,7 +1629,7 @@ async function criarEquipe(){
   const nome=el.value.trim();
   if(!nome){showToast('Dê um nome à equipe','error');return;}
   try{
-    const{data:t,error}=await sb.from('teams').insert({nome,owner_id:USER.id}).select().single();
+    const{data:t,error}=await sb.from('teams').insert({nome,owner_id:USER.id,avatar:_avatarEquipeSel||'av1'}).select().single();
     if(error)throw error;
     // entro como membro 'dono' já aceito
     const{error:e2}=await sb.from('team_members').insert({
@@ -1356,6 +1661,9 @@ async function convidarMembro(teamId){
     }
     inp.value='';
     showToast(achado?('Convite enviado para '+(achado.nome||email)):('Convite registrado para '+email+' — ele(a) verá ao se cadastrar'),'success',4500);
+    // NOTIFICAÇÃO: pessoa adicionada/convidada para a equipe — item 2.1
+    const teamObj=TEAMS.find(x=>x.id===teamId);
+    dispararConviteEquipe(email, achado, teamObj?teamObj.nome:'');
     await carregarEquipes();
     renderTeamBody();
   }catch(err){showToast('Erro ao convidar: '+err.message,'error',5000);}
@@ -1871,18 +2179,26 @@ async function salvarDemanda(){
     payload.assignment_status='none';
   }
 
+  const prevDemanda = id ? DEMANDAS.find(x=>x.id===id) : null;
   const btn=document.getElementById('save-btn');btn.disabled=true;btn.textContent='Salvando...';
   try{
     if(id){
       const{error}=await sb.from('demandas').update(payload).eq('id',id);
       if(error)throw error;
       showToast('Demanda atualizada','success');
+      // NOTIFICAÇÃO: responsável atribuído AGORA (não tinha antes) — item 2.1
+      if(payload.assigned_to && (!prevDemanda || prevDemanda.assigned_to!==payload.assigned_to)){
+        dispararNotificacao('demanda_atribuida', {...payload, id}, {});
+      }
     }else{
       payload.user_id=USER.id;
       payload.created_by=USER.id;
-      const{error}=await sb.from('demandas').insert(payload);
+      const{data:inserida,error}=await sb.from('demandas').insert(payload).select().single();
       if(error)throw error;
       showToast(payload.assignment_status==='pending'?'Demanda criada e enviada para aprovação do responsável':'Demanda criada','success');
+      // NOTIFICAÇÃO: demanda criada -> criador (+ responsável, se atribuído) — itens 2 e 2.1
+      const novaD={...payload, id:(inserida&&inserida.id)||null};
+      dispararNotificacao('demanda_criada', novaD, {});
     }
     closeModal();
     await carregarDemandas();
@@ -1894,10 +2210,13 @@ async function salvarDemanda(){
    AÇÕES: concluir / arquivar / excluir
    ============================================================ */
 async function concluirDemanda(id){
+  const d=DEMANDAS.find(x=>x.id===id);
   try{
     const{error}=await sb.from('demandas').update({status:'Concluído',data_saida:hojeISO(),percentual_progresso:100}).eq('id',id);
     if(error)throw error;
     showToast('Demanda concluída','success');
+    // NOTIFICAÇÃO: conclusão -> criador + responsável + equipe — item 2.3
+    if(d) dispararNotificacao('status_alterado', {...d, status:'Concluído'}, {de:d.status, para:'Concluído'});
     await carregarDemandas();
   }catch(err){showToast('Erro: '+err.message,'error');}
 }
@@ -1935,6 +2254,8 @@ async function confirmarMove(id,novo){
     if(error)throw error;
     closeMove();
     showToast('Movida para “'+novo+'”'+(nota?' com anotação':''),'success',2400);
+    // NOTIFICAÇÃO: mudança de status -> criador + responsável + equipe da demanda — item 2.3
+    dispararNotificacao('status_alterado', {...d, status:novo}, {de:d.status, para:novo, nota:nota||''});
     await carregarDemandas();
   }catch(err){showToast('Erro: '+err.message,'error',5000);}
   finally{ btn.disabled=false; btn.textContent='Mover'; }
@@ -1952,10 +2273,13 @@ async function toggleFlag(id){
   }catch(err){showToast('Erro: '+err.message,'error');}
 }
 async function arquivarDemanda(id){
+  const d=DEMANDAS.find(x=>x.id===id);
   try{
     const{error}=await sb.from('demandas').update({is_archived:true,status:'Arquivado'}).eq('id',id);
     if(error)throw error;
     showToast('Demanda arquivada 📦','success');
+    // NOTIFICAÇÃO: arquivamento -> criador + responsável + equipe — item 2.3
+    if(d) dispararNotificacao('status_alterado', {...d, status:'Arquivado'}, {de:d.status, para:'Arquivado'});
     await carregarDemandas();
   }catch(err){showToast('Erro: '+err.message,'error');}
 }
@@ -2004,6 +2328,9 @@ document.querySelectorAll('.overlay').forEach(o=>o.addEventListener('click',e=>{
    ============================================================ */
 (async function init(){
   switchAuth('login');
+  // Prepara o seletor de país (DDI) do cadastro, com Brasil como padrão
+  preencherDDI('su-ddi','55');
+  atualizarDicaTelefone('su');
   try{
     const{data:{session}}=await sb.auth.getSession();
     if(session&&session.user){await iniciarApp(session.user);}
