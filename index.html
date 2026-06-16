@@ -387,7 +387,7 @@ label.field>span{display:block;font-size:12px;color:var(--text-secondary);margin
 
 /* Cartão de equipe dentro do modal */
 .team-card{border:1px solid var(--glass-border);border-radius:14px;padding:14px;margin-bottom:12px;background:rgba(255,255,255,.03)}
-.team-card .t-head{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.team-card .t-head{display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap}
 .team-card .t-head h4{font-family:'Sora';font-size:14.5px;font-weight:600;flex:1;min-width:0;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .team-card .t-owner{font-size:9.5px;font-weight:700;padding:3px 8px;border-radius:20px;
@@ -1770,8 +1770,8 @@ function renderTeamBody(){
         <h4>${esc(t.nome)}</h4>
         <span class="${souDono?'t-owner':'t-member'}">${souDono?'Você é dono':'Membro'}</span>
         ${souDono
-          ?`<button class="icon-btn" onclick="excluirEquipe('${t.id}')" title="Excluir equipe e suas demandas" style="color:var(--danger);padding:5px">${IC.trash}</button>`
-          :`<button class="btn btn-danger btn-sm" onclick="sairDaEquipe('${t.id}')" title="Sair desta equipe" style="padding:5px 10px">Sair</button>`}
+          ?`<button type="button" class="btn btn-danger btn-sm t-action" onclick="excluirEquipe('${t.id}')" title="Excluir equipe e suas demandas" style="padding:5px 12px;flex-shrink:0">🗑 Excluir</button>`
+          :`<button type="button" class="btn btn-danger btn-sm t-action" onclick="sairDaEquipe('${t.id}')" title="Sair desta equipe" style="padding:5px 12px;flex-shrink:0">Sair</button>`}
       </div>
       ${membersHTML}
       <div class="invite-row">
