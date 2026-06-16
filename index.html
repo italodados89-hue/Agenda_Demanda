@@ -313,6 +313,10 @@ label.field>span{display:block;font-size:12px;color:var(--text-secondary);margin
 .range-row b{min-width:44px;text-align:right;font-family:'Sora',sans-serif}
 
 /* Confirm dialog */
+/* O diálogo de confirmação precisa ficar ACIMA de qualquer outro modal
+   (ex.: ao excluir/sair de equipe a partir do modal de Equipes). Sem isto
+   ele abria ATRÁS do modal de Equipes e parecia que nada acontecia. */
+#modal-confirm{z-index:1000}
 .confirm{max-width:380px;text-align:center;padding:28px 24px}
 .confirm h3{font-size:17px;margin-bottom:8px}
 .confirm p{font-size:13.5px;color:var(--text-secondary);margin-bottom:22px;line-height:1.5}
