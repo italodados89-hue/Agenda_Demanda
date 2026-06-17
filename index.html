@@ -2496,13 +2496,13 @@ function render(){
         const groupKey=`${status}__${prio}`;
         // Mantém estado de collapse via dataset após re-render (relaxado em reabertura)
         return `<div class="prio-group" data-group-key="${esc(groupKey)}">
-          <div class="prio-group-head" onclick="togglePrioGroup(this)" title="Recolher / expandir ${esc(prio)}">
+          <div class="prio-group-head collapsed" onclick="togglePrioGroup(this)" title="Expandir / recolher ${esc(prio)}">
             <span class="prio-group-dot" style="background:${prioColor}"></span>
             <span class="prio-group-label">${esc(prio)}</span>
             <span class="prio-group-count">${prioCards.length}</span>
             <svg class="prio-group-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
           </div>
-          <div class="prio-group-body">
+          <div class="prio-group-body collapsed">
             ${prioCards.map(cardHTML).join('')}
           </div>
         </div>`;
