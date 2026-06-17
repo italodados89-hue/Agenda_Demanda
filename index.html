@@ -232,6 +232,30 @@ label.field>span{display:block;font-size:12px;color:var(--text-secondary);margin
   border:1px solid var(--glass-border);border-top:none;border-radius:0 0 13px 13px;background:rgba(255,255,255,0.02);min-height:80px}
 .col-empty{color:var(--text-muted);font-size:11.5px;text-align:center;padding:18px 6px;border:1px dashed var(--glass-border);border-radius:10px}
 
+/* ===================== KANBAN — GRUPOS DE PRIORIDADE ===================== */
+/* Cada coluna do pipeline agrupa os cards por prioridade com collapse/expand */
+.prio-group{margin-bottom:8px}
+.prio-group:last-child{margin-bottom:0}
+.prio-group-head{
+  display:flex;align-items:center;gap:7px;
+  padding:5px 9px;border-radius:8px;cursor:pointer;
+  background:rgba(255,255,255,0.05);
+  border:1px solid var(--glass-border);
+  transition:background .18s;
+  user-select:none;
+  -webkit-user-select:none;
+}
+.prio-group-head:hover{background:rgba(255,255,255,0.10)}
+.prio-group-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.prio-group-label{font-size:10px;font-weight:700;flex:1;letter-spacing:.4px;text-transform:uppercase;color:var(--text-secondary)}
+.prio-group-count{font-size:10px;color:var(--text-secondary);background:rgba(255,255,255,0.09);padding:2px 7px;border-radius:20px;font-weight:700;flex-shrink:0}
+.prio-group-chevron{width:13px;height:13px;color:var(--text-muted);transition:transform .22s ease;flex-shrink:0}
+.prio-group-head.collapsed .prio-group-chevron{transform:rotate(-90deg)}
+.prio-group-body{display:flex;flex-direction:column;gap:8px;margin-top:7px;
+  animation:pGroupIn .2s ease}
+.prio-group-body.collapsed{display:none}
+@keyframes pGroupIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+
 /* ===================== CARD (compacto — cabe nas colunas estreitas) ===================== */
 /* MELHORIA: padding e tipografia reduzidos; min-width:0 garante que o texto quebre dentro da coluna */
 .card{padding:11px;border-radius:12px;background:var(--bg-card);border:1px solid var(--glass-border);
@@ -2458,14 +2482,49 @@ function render(){
            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
            ${venc2} em 2 dias</span>`
       : '';
+    // Agrupar cards por prioridade (ordem: Crítica → Alta → Normal → Baixa)
+    const PRIO_ORDER=['Crítica','Alta','Normal','Baixa'];
+    const PRIO_COLORS={'Crítica':'var(--danger)','Alta':'var(--warning)','Normal':'var(--accent)','Baixa':'var(--text-muted)'};
+    let colBodyHTML='';
+    if(!cards.length){
+      colBodyHTML='<div class="col-empty">Vazio</div>';
+    } else {
+      const grupos=PRIO_ORDER.map(prio=>{
+        const prioCards=cards.filter(d=>d.prioridade===prio);
+        if(!prioCards.length) return '';
+        const prioColor=PRIO_COLORS[prio]||'var(--text-muted)';
+        const groupKey=`${status}__${prio}`;
+        // Mantém estado de collapse via dataset após re-render (relaxado em reabertura)
+        return `<div class="prio-group" data-group-key="${esc(groupKey)}">
+          <div class="prio-group-head" onclick="togglePrioGroup(this)" title="Recolher / expandir ${esc(prio)}">
+            <span class="prio-group-dot" style="background:${prioColor}"></span>
+            <span class="prio-group-label">${esc(prio)}</span>
+            <span class="prio-group-count">${prioCards.length}</span>
+            <svg class="prio-group-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+          </div>
+          <div class="prio-group-body">
+            ${prioCards.map(cardHTML).join('')}
+          </div>
+        </div>`;
+      }).join('');
+      colBodyHTML=grupos||'<div class="col-empty">Vazio</div>';
+    }
     return `<div class="column">
       <div class="col-head">
         <div class="c-title"><span class="col-dot" style="background:${cor}"></span>${esc(status)}</div>
         <div class="c-right">${alerta}<span class="c-count">${cards.length}</span></div>
       </div>
-      <div class="col-body">${cards.length?cards.map(cardHTML).join(''):'<div class="col-empty">Vazio</div>'}</div>
+      <div class="col-body">${colBodyHTML}</div>
     </div>`;
   }).join('');
+}
+/* ── Collapse / expand de grupo de prioridade ─────────────────────────────
+   Chamada via onclick no cabeçalho do grupo. Não faz re-render:
+   apenas alterna classes no DOM, o que é instantâneo e não perde scroll. */
+function togglePrioGroup(el){
+  el.classList.toggle('collapsed');
+  const body=el.nextElementSibling;
+  if(body&&body.classList.contains('prio-group-body')) body.classList.toggle('collapsed');
 }
 // Ícones SVG minimalistas (item 8)
 const IC={
