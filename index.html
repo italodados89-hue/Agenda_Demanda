@@ -474,6 +474,23 @@ label.field>span{display:block;font-size:12px;color:var(--text-secondary);margin
 .team-card .t-ava svg{width:100%;height:100%;display:block}
 .invite-card .ic-ava{width:30px;height:30px;border-radius:50%;overflow:hidden;flex-shrink:0;vertical-align:middle;display:inline-block}
 .invite-card .ic-ava svg{width:100%;height:100%}
+
+/* ===================== SELETOR DE IDIOMA (i18n PT/ES) ===================== */
+.lang-switch{display:inline-flex;gap:3px;background:rgba(255,255,255,0.05);border:1px solid var(--glass-border);
+  padding:3px;border-radius:9px;flex-shrink:0}
+.lang-switch button{background:transparent;border:none;color:var(--text-secondary);cursor:pointer;
+  font-weight:700;font-size:11.5px;padding:5px 9px;border-radius:6px;transition:.16s;letter-spacing:.3px;display:inline-flex;align-items:center;gap:4px}
+.lang-switch button.active{background:rgba(91,140,255,0.22);color:#fff}
+.lang-switch button:hover{color:var(--text-primary)}
+/* canto superior do cartão de login */
+.login-top{display:flex;justify-content:flex-end;margin-bottom:8px}
+/* link "esqueci minha senha" */
+.auth-link{display:block;text-align:center;margin-top:13px;color:var(--accent);font-size:12.5px;
+  font-weight:600;cursor:pointer;text-decoration:none;background:none;border:none;width:100%}
+.auth-link:hover{text-decoration:underline}
+.auth-back{display:inline-flex;align-items:center;gap:5px;color:var(--text-secondary);font-size:12.5px;
+  font-weight:600;cursor:pointer;background:none;border:none;margin-bottom:14px;padding:0}
+.auth-back:hover{color:var(--text-primary)}
 </style>
 </head>
 <body>
@@ -481,8 +498,14 @@ label.field>span{display:block;font-size:12px;color:var(--text-secondary);margin
 <!-- ===================== TELA DE LOGIN ===================== -->
 <div id="login-screen">
   <div class="login-card glass">
+    <div class="login-top">
+      <div class="lang-switch" role="group" aria-label="Idioma / Idioma">
+        <button type="button" id="lang-pt-login" class="active" onclick="setLang('pt')">🇧🇷 PT</button>
+        <button type="button" id="lang-es-login" onclick="setLang('es')">🇪🇸 ES</button>
+      </div>
+    </div>
     <div class="brand">Pipeline de Demandas</div>
-    <div class="sub">Controle pessoal de demandas e prazos</div>
+    <div class="sub" data-i18n>Controle pessoal de demandas e prazos</div>
     <div class="auth-tabs">
       <button id="tab-login" class="active" onclick="switchAuth('login')">Entrar</button>
       <button id="tab-signup" onclick="switchAuth('signup')">Criar conta</button>
@@ -499,6 +522,21 @@ label.field>span{display:block;font-size:12px;color:var(--text-secondary);margin
           <input class="input" type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password">
         </label>
         <button class="btn btn-primary" id="login-btn" style="width:100%;margin-top:6px" onclick="doLogin()">Entrar</button>
+        <button type="button" class="auth-link" onclick="abrirRecuperar()">Esqueci minha senha</button>
+      </form>
+    </div>
+
+    <!-- RECUPERAR SENHA (pedir e-mail) -->
+    <div class="auth-pane" id="pane-recover">
+      <button type="button" class="auth-back" onclick="voltarLogin()">← Voltar ao login</button>
+      <div class="m-sub" style="text-align:left;margin-bottom:16px;color:var(--text-secondary);font-size:13px">
+        Informe o e-mail da sua conta. Enviaremos um link para você redefinir a senha.
+      </div>
+      <form onsubmit="return false">
+        <label class="field"><span>E-mail</span>
+          <input class="input" type="email" id="rec-email" placeholder="voce@email.com" autocomplete="email">
+        </label>
+        <button class="btn btn-primary" id="rec-btn" style="width:100%;margin-top:6px" onclick="enviarRecuperacao()">Enviar link de redefinição</button>
       </form>
     </div>
 
@@ -568,6 +606,31 @@ label.field>span{display:block;font-size:12px;color:var(--text-secondary);margin
   </div>
 </div>
 
+<!-- ===================== TELA: DEFINIR NOVA SENHA (volta do link de recuperação) ===================== -->
+<div id="recovery-screen" style="display:none;min-height:100vh;align-items:center;justify-content:center;padding:20px">
+  <div class="login-card glass">
+    <div class="login-top">
+      <div class="lang-switch" role="group" aria-label="Idioma / Idioma">
+        <button type="button" id="lang-pt-rec" class="active" onclick="setLang('pt')">🇧🇷 PT</button>
+        <button type="button" id="lang-es-rec" onclick="setLang('es')">🇪🇸 ES</button>
+      </div>
+    </div>
+    <div class="brand">Pipeline de Demandas</div>
+    <div class="sub">Defina sua nova senha</div>
+    <form onsubmit="return false">
+      <label class="field"><span>Nova senha *</span>
+        <input class="input" type="password" id="nv-pass" placeholder="Mínimo 6 caracteres" autocomplete="new-password" oninput="checarNovasSenhas()">
+      </label>
+      <label class="field" style="margin-bottom:4px"><span>Confirmar nova senha *</span>
+        <input class="input" type="password" id="nv-pass2" placeholder="Repita a nova senha" autocomplete="new-password" oninput="checarNovasSenhas()">
+      </label>
+      <div class="pass-hint" id="nv-hint"></div>
+      <button class="btn btn-primary" id="nv-btn" style="width:100%;margin-top:6px" onclick="salvarNovaSenha()">Salvar nova senha</button>
+    </form>
+    <p id="rec-msg" style="font-size:12.5px;color:var(--text-secondary);text-align:center;margin-top:14px;min-height:18px"></p>
+  </div>
+</div>
+
 <!-- ===================== APLICAÇÃO ===================== -->
 <div id="app">
   <header class="topbar">
@@ -585,6 +648,10 @@ label.field>span{display:block;font-size:12px;color:var(--text-secondary);margin
       <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 4v4h-4"/></svg></button>
     <button class="icon-btn" onclick="openConfig()" title="Configurações">
       <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
+    <div class="lang-switch" role="group" aria-label="Idioma / Idioma">
+      <button type="button" id="lang-pt-app" class="active" onclick="setLang('pt')">🇧🇷 PT</button>
+      <button type="button" id="lang-es-app" onclick="setLang('es')">🇪🇸 ES</button>
+    </div>
     <div class="user-chip"><span class="dot"></span><span id="user-email">—</span></div>
     <button class="avatar-btn" id="topbar-avatar" onclick="openProfile()" title="Meu perfil">
       <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></button>
@@ -859,6 +926,7 @@ let PROFILE = null;         // perfil do usuário (nome, sexo, foto, aprovação
 let DEMANDAS = [];          // todas as demandas do usuário
 let CONFIG = null;          // listas configuráveis do usuário
 let authMode = 'login';
+let _recoveryMode = false;     // true enquanto o usuário está redefinindo a senha (volta do link)
 const ADMIN_EMAIL = 'italo.dados89@gmail.com';
 
 /* ---- Estado de EQUIPES / COLABORAÇÃO ---- */
@@ -1313,12 +1381,115 @@ function dispararConviteEquipe(emailConvidado, achado, nomeEquipe){
 // Alterna entre as abas Entrar / Criar conta / Admin
 function switchAuth(mode){
   authMode=mode;
+  // a aba de recuperação não é um tab — garante que feche ao trocar de aba
+  document.getElementById('pane-recover').classList.remove('active');
   ['login','signup','admin'].forEach(m=>{
     document.getElementById('tab-'+m).classList.toggle('active',m===mode);
     document.getElementById('pane-'+m).classList.toggle('active',m===mode);
   });
   document.getElementById('auth-msg').textContent='';
   document.getElementById('auth-msg').style.color='var(--text-secondary)';
+}
+
+/* ============================================================
+   RECUPERAÇÃO DE SENHA (Supabase Auth — sem mudança de schema)
+   ------------------------------------------------------------
+   Fluxo:
+   1) abrirRecuperar(): mostra a aba "esqueci a senha" (pede e-mail).
+   2) enviarRecuperacao(): sb.auth.resetPasswordForEmail(...) -> Supabase
+      envia o e-mail com um link que volta para ESTA página.
+   3) Ao voltar pelo link, o Supabase coloca um token no #hash e emite o
+      evento PASSWORD_RECOVERY. Detectamos isso e mostramos a tela de
+      NOVA SENHA (mostrarTelaNovaSenha) — NUNCA entramos no app direto.
+   4) salvarNovaSenha(): valida a dupla confirmação e chama
+      sb.auth.updateUser({password}). Depois desloga e volta ao login.
+   ============================================================ */
+// Mostra o painel de "informar e-mail" para recuperar a senha
+function abrirRecuperar(){
+  ['login','signup','admin'].forEach(m=>{
+    document.getElementById('tab-'+m).classList.remove('active');
+    document.getElementById('pane-'+m).classList.remove('active');
+  });
+  document.getElementById('pane-recover').classList.add('active');
+  document.getElementById('auth-msg').textContent='';
+  const e=document.getElementById('login-email').value.trim();
+  if(e) document.getElementById('rec-email').value=e;   // pré-preenche se já digitou
+  setTimeout(()=>document.getElementById('rec-email').focus(),60);
+}
+function voltarLogin(){ switchAuth('login'); }
+
+// Envia o e-mail de redefinição. redirectTo volta para esta MESMA página
+// (origin + caminho), por isso funciona em qualquer hospedagem (ex.: GitHub Pages).
+async function enviarRecuperacao(){
+  const email=document.getElementById('rec-email').value.trim();
+  if(!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){ authMsg('Informe um e-mail válido.'); return; }
+  const btn=document.getElementById('rec-btn'); btn.disabled=true; btn.textContent='Enviando...';
+  try{
+    const redirectTo = window.location.origin + window.location.pathname;  // ex.: https://italodados89-hue.github.io/Agenda_Demanda/
+    const{error}=await sb.auth.resetPasswordForEmail(email,{ redirectTo });
+    if(error) throw error;
+    // Mensagem neutra (não revela se o e-mail existe — boa prática de segurança)
+    authMsg('Se houver uma conta com este e-mail, enviamos um link para redefinir a senha. Verifique a caixa de entrada e o spam.', true);
+  }catch(err){ authMsg(traduzErro(err.message)); }
+  finally{ btn.disabled=false; btn.textContent='Enviar link de redefinição'; }
+}
+
+// Valida em tempo real se as duas novas senhas batem
+function checarNovasSenhas(){
+  const p1=document.getElementById('nv-pass').value;
+  const p2=document.getElementById('nv-pass2').value;
+  const h=document.getElementById('nv-hint');
+  if(!p2){ h.textContent=''; h.className='pass-hint'; return true; }
+  if(p1===p2){ h.textContent='✓ As senhas coincidem'; h.className='pass-hint ok'; return true; }
+  h.textContent='✗ As senhas não coincidem'; h.className='pass-hint bad'; return false;
+}
+function recMsg(txt, ok=false){
+  const m=document.getElementById('rec-msg');
+  m.textContent=txt; m.style.color=ok?'var(--success)':'var(--danger)';
+}
+// Mostra a tela de definir nova senha (chamada ao voltar do link de recuperação)
+function mostrarTelaNovaSenha(){
+  _recoveryMode=true;
+  document.getElementById('login-screen').style.display='none';
+  document.getElementById('app').style.display='none';
+  const sc=document.getElementById('recovery-screen');
+  sc.style.display='flex';
+  document.getElementById('nv-pass').value='';
+  document.getElementById('nv-pass2').value='';
+  document.getElementById('nv-hint').textContent='';
+  recMsg('');
+  setTimeout(()=>document.getElementById('nv-pass').focus(),80);
+}
+// Grava a nova senha. Depois desloga e devolve ao login (evita ficar numa
+// sessão "meio logada" só de recuperação — esse era um bug comum).
+async function salvarNovaSenha(){
+  const p1=document.getElementById('nv-pass').value;
+  const p2=document.getElementById('nv-pass2').value;
+  if(p1.length<6){ recMsg('A senha precisa ter ao menos 6 caracteres.'); return; }
+  if(p1!==p2){ recMsg('As senhas não coincidem.'); return; }
+  const btn=document.getElementById('nv-btn'); btn.disabled=true; btn.textContent='Salvando...';
+  try{
+    const{error}=await sb.auth.updateUser({ password:p1 });
+    if(error) throw error;
+    recMsg('Senha alterada com sucesso! Você já pode entrar com a nova senha.', true);
+    // limpa o token do endereço e desloga a sessão temporária de recuperação
+    try{ history.replaceState(null,'',window.location.origin+window.location.pathname); }catch(e){}
+    await sb.auth.signOut();
+    _recoveryMode=false;
+    setTimeout(()=>{
+      document.getElementById('recovery-screen').style.display='none';
+      document.getElementById('login-screen').style.display='flex';
+      switchAuth('login');
+      authMsg('Senha redefinida. Entre com a sua nova senha.', true);
+    }, 1600);
+  }catch(err){
+    // token expirado/ausente -> orienta a pedir um novo link
+    if(/session|expired|token|missing/i.test(err.message||'')){
+      recMsg('O link expirou ou já foi usado. Volte ao login e solicite um novo link.');
+    }else{
+      recMsg(traduzErro(err.message));
+    }
+  }finally{ btn.disabled=false; btn.textContent='Salvar nova senha'; }
 }
 function authMsg(txt,ok=false){
   const m=document.getElementById('auth-msg');
@@ -2709,22 +2880,464 @@ document.querySelectorAll('.overlay').forEach(o=>o.addEventListener('click',e=>{
 /* ============================================================
    INIT — verifica sessão existente
    ============================================================ */
+/* ============================================================
+   I18N — TRADUTOR PT / ES (Português / Espanhol)
+   ------------------------------------------------------------
+   NÃO altera nenhuma lógica nem os valores salvos no banco.
+   É uma CAMADA visual: percorre os nós de texto e os atributos
+   (placeholder/title) e troca o texto exibido para Espanhol.
+   • Os <option> têm o atributo `value` "fixado" no texto ORIGINAL
+     (PT) ANTES de traduzir o que aparece — assim `select.value`
+     continua em PT e o salvamento/filtragem nunca quebram.
+   • Um MutationObserver re-traduz o que é gerado dinamicamente
+     (cards, listas, toasts) quando o idioma está em ES.
+   • Para voltar ao PT, restauramos o texto original guardado.
+   Como adicionar mais idiomas no futuro: criar outro mapa (ex.: I18N.en)
+   e um botão chamando setLang('en').
+   ============================================================ */
+const I18N = {
+  // Espanhol (LATAM). Só entram chaves cujo texto MUDA do português.
+  es: {
+    // ---- Login / autenticação ----
+    "Controle pessoal de demandas e prazos":"Control personal de demandas y plazos",
+    "Criar conta":"Crear cuenta",
+    "E-mail":"Correo electrónico",
+    "Senha":"Contraseña",
+    "Nome *":"Nombre *",
+    "E-mail *":"Correo electrónico *",
+    "Telefone / WhatsApp *":"Teléfono / WhatsApp *",
+    "Telefone / WhatsApp":"Teléfono / WhatsApp",
+    "Feminino":"Femenino",
+    "Não informar":"No informar",
+    "Senha *":"Contraseña *",
+    "Confirmar senha *":"Confirmar contraseña *",
+    "Esqueci minha senha":"Olvidé mi contraseña",
+    "← Voltar ao login":"← Volver al inicio de sesión",
+    "Informe o e-mail da sua conta. Enviaremos um link para você redefinir a senha.":"Ingrese el correo de su cuenta. Le enviaremos un enlace para restablecer la contraseña.",
+    "Enviar link de redefinição":"Enviar enlace de restablecimiento",
+    "Defina sua nova senha":"Defina su nueva contraseña",
+    "Nova senha *":"Nueva contraseña *",
+    "Confirmar nova senha *":"Confirmar nueva contraseña *",
+    "Salvar nova senha":"Guardar nueva contraseña",
+    "🔐 Área restrita. Entre com o e-mail e a senha de administrador para liberar o acesso de novos usuários ao portal.":"🔐 Área restringida. Ingrese con el correo y la contraseña de administrador para habilitar el acceso de nuevos usuarios al portal.",
+    "E-mail do admin":"Correo del administrador",
+    "Entrar no painel":"Ingresar al panel",
+    "Usuários":"Usuarios",
+    "Sair do painel":"Salir del panel",
+    "Acessar plataforma":"Acceder a la plataforma",
+    "Entrar":"Ingresar",
+    // ---- Placeholders ----
+    "Seu nome completo":"Su nombre completo",
+    "DDD + número":"Cód. de área + número",
+    "Repita a senha":"Repita la contraseña",
+    "Repita a nova senha":"Repita la nueva contraseña",
+    "Seu nome":"Su nombre",
+    "Quem pediu":"Quién solicitó",
+    "Quem executa":"Quién ejecuta",
+    "Resumo curto (ex.: Renovar contrato Klabin)":"Resumen corto (ej.: Renovar contrato Klabin)",
+    "Detalhes adicionais, contexto, links internos...":"Detalles adicionales, contexto, enlaces internos...",
+    "Descrição, solicitante, tipo, responsável, destino, observações, tags...":"Descripción, solicitante, tipo, responsable, destino, observaciones, etiquetas...",
+    "Ex.: enviado para validação do cliente; aguardando retorno do financeiro...":"Ej.: enviado para validación del cliente; esperando respuesta de finanzas...",
+    "convidar colega pelo e-mail...":"invitar colega por correo...",
+    "Nome da equipe (ex.: Contratos LATAM)":"Nombre del equipo (ej.: Contratos LATAM)",
+    // ---- Topbar / barra de ferramentas ----
+    "Equipes e colaboração":"Equipos y colaboración",
+    "Equipe":"Equipo",
+    "Nova demanda":"Nueva demanda",
+    "Nova Demanda":"Nueva Demanda",
+    "Atualizar":"Actualizar",
+    "Configurações":"Configuración",
+    "Meu perfil":"Mi perfil",
+    "Sair":"Salir",
+    "Buscar e filtrar demandas":"Buscar y filtrar demandas",
+    "Buscar e filtrar":"Buscar y filtrar",
+    "Arquivadas":"Archivadas",
+    "Ordenar: prazo mais próximo":"Ordenar: plazo más próximo",
+    "Ordenar: entrada recente":"Ordenar: entrada reciente",
+    "Ordenar: prioridade":"Ordenar: prioridad",
+    "Busca livre":"Búsqueda libre",
+    "Status":"Estado",
+    "Prioridade":"Prioridad",
+    "Responsável":"Responsable",
+    "Só atrasadas":"Solo atrasadas",
+    "Limpar filtros":"Limpiar filtros",
+    // ---- KPIs ----
+    "Abertas":"Abiertas",
+    "Para hoje":"Para hoy",
+    "Na semana":"En la semana",
+    "Concluídas · mês":"Concluidas · mes",
+    // ---- Modal demanda ----
+    "Preencha os dados. Campos com * são obrigatórios.":"Complete los datos. Los campos con * son obligatorios.",
+    "Data de entrada *":"Fecha de entrada *",
+    "Prazo / prevista saída":"Plazo / salida prevista",
+    "Tipo da demanda *":"Tipo de demanda *",
+    "Categoria":"Categoría",
+    "Destino da demanda":"Destino de la demanda",
+    "Responsável (texto livre)":"Responsable (texto libre)",
+    "Pessoal (sem equipe)":"Personal (sin equipo)",
+    "Atribuir a (responsável da equipe) — precisa aprovar":"Asignar a (responsable del equipo) — debe aprobar",
+    "— ninguém —":"— nadie —",
+    "Prioridade *":"Prioridad *",
+    "Status *":"Estado *",
+    "Data real de conclusão":"Fecha real de conclusión",
+    "🔁 Recorrência (repete automaticamente na Entrada)":"🔁 Recurrencia (se repite automáticamente en Entrada)",
+    "Não repete (demanda única)":"No se repite (demanda única)",
+    "Todo dia":"Todos los días",
+    "Toda semana":"Cada semana",
+    "Quinzenal (a cada 15 dias)":"Quincenal (cada 15 días)",
+    "Mensal":"Mensual",
+    "Título da Demanda *":"Título de la Demanda *",
+    "Progresso:":"Progreso:",
+    "Texto curto — os detalhes longos vão em Observações.":"Texto corto — los detalles largos van en Observaciones.",
+    "Observações":"Observaciones",
+    "Link de referência":"Enlace de referencia",
+    "Tags (separadas por vírgula)":"Etiquetas (separadas por coma)",
+    "Histórico de movimentações":"Historial de movimientos",
+    "Salvar":"Guardar",
+    // ---- Perfil ----
+    "Adicione uma foto e mantenha seus dados atualizados.":"Agregue una foto y mantenga sus datos actualizados.",
+    "📷 Trocar foto":"📷 Cambiar foto",
+    "Trocar foto":"Cambiar foto",
+    "Nome":"Nombre",
+    "Fechar":"Cerrar",
+    // ---- Configurações ----
+    "⚙ Configurações":"⚙ Configuración",
+    "Você é o dono das suas listas. Adicione ou remova opções dos campos abaixo. Tudo é salvo na sua conta.":"Usted es el dueño de sus listas. Agregue o elimine opciones de los campos a continuación. Todo se guarda en su cuenta.",
+    "Salvar configurações":"Guardar configuración",
+    "Categorias":"Categorías",
+    "Status do pipeline":"Estado del pipeline",
+    "Responsáveis":"Responsables",
+    "Nenhum item":"Ningún elemento",
+    "Remover":"Quitar",
+    // ---- Confirmação ----
+    "Tem certeza?":"¿Está seguro?",
+    "Excluir demanda":"Eliminar demanda",
+    "Excluir equipe e demandas":"Eliminar equipo y demandas",
+    "Sair da equipe":"Salir del equipo",
+    // ---- Equipes / convites ----
+    "👥 Equipes":"👥 Equipos",
+    "Monte equipes, convide pessoas pelo e-mail e atribua demandas a elas. Qualquer membro aceito pode convidar e atribuir tarefas a colegas do time.":"Arme equipos, invite personas por correo y asígneles demandas. Cualquier miembro aceptado puede invitar y asignar tareas a colegas del equipo.",
+    "📨 Convites de equipe":"📨 Invitaciones de equipo",
+    "Você foi convidado para participar de uma ou mais equipes. Aceite para colaborar e receber demandas.":"Usted fue invitado a participar en uno o más equipos. Acepte para colaborar y recibir demandas.",
+    "Decidir depois":"Decidir después",
+    "✅ Demandas atribuídas a você":"✅ Demandas asignadas a usted",
+    "Estas demandas foram atribuídas a você por um colega. Aprove para confirmar que está ciente — sua foto aparecerá no card.":"Estas demandas le fueron asignadas por un colega. Apruebe para confirmar que está al tanto — su foto aparecerá en la tarjeta.",
+    "📥 Demandas da equipe para você decidir":"📥 Demandas del equipo para que usted decida",
+    "Estas demandas foram direcionadas a uma equipe sua (não a você diretamente). Aceite as que são para você — só elas entram no seu pipeline. Assim o Kanban fica limpo.":"Estas demandas fueron dirigidas a un equipo suyo (no a usted directamente). Acepte las que son para usted — solo esas entran en su pipeline. Así el Kanban queda limpio.",
+    "Registre uma anotação sobre esta movimentação (opcional, mas ajuda a entender o processo).":"Registre una nota sobre este movimiento (opcional, pero ayuda a entender el proceso).",
+    "Anotação da movimentação":"Nota del movimiento",
+    "Você ainda não tem equipes. Crie uma abaixo e convide colegas pelo e-mail.":"Aún no tiene equipos. Cree uno abajo e invite colegas por correo.",
+    "Você é dono":"Usted es dueño",
+    "Membro":"Miembro",
+    "🗑 Excluir":"🗑 Eliminar",
+    "Excluir equipe e suas demandas":"Eliminar equipo y sus demandas",
+    "Sair desta equipe":"Salir de este equipo",
+    "Convidar":"Invitar",
+    "➕ Criar nova equipe":"➕ Crear nuevo equipo",
+    "Avatar da equipe (ajuda na identificação visual)":"Avatar del equipo (ayuda en la identificación visual)",
+    "Criar":"Crear",
+    "Remover da equipe":"Quitar del equipo",
+    "Pendente":"Pendiente",
+    "Aceito":"Aceptado",
+    "Recusou":"Rechazó",
+    "Carregando...":"Cargando...",
+    "Liberado":"Habilitado",
+    "Revogar":"Revocar",
+    "Liberar":"Habilitar",
+    "(sem nome)":"(sin nombre)",
+    "Nenhum usuário ainda.":"Aún no hay usuarios.",
+    // ---- Convites / atribuição / aceite (botões) ----
+    "Aceitar e entrar":"Aceptar y entrar",
+    "Recusar":"Rechazar",
+    "Aprovar":"Aprobar",
+    "Aceitar no meu pipeline":"Aceptar en mi pipeline",
+    "Não é para mim":"No es para mí",
+    // ---- Board / cards ----
+    "Nenhuma demanda por aqui":"Ninguna demanda por aquí",
+    "Você não tem demandas arquivadas.":"No tiene demandas archivadas.",
+    "Não foi possível carregar":"No fue posible cargar",
+    "Vazio":"Vacío",
+    "sem prazo":"sin plazo",
+    "Arquivar":"Archivar",
+    "Reativar":"Reactivar",
+    "Excluir":"Eliminar",
+    "Remover destaque":"Quitar destaque",
+    "Destacar como importante":"Destacar como importante",
+    "falta aprovar":"falta aprobar",
+    "aprovado ✓":"aprobado ✓",
+    "recusou":"rechazó",
+    "aguardando aprovação do responsável":"esperando aprobación del responsable",
+    "faz parte desta demanda":"forma parte de esta demanda",
+    "não aceitou a demanda":"no aceptó la demanda",
+    "Responsável:":"Responsable:",
+    // ---- Valores de status (exibição; o valor salvo continua em PT) ----
+    "Planejado":"Planificado",
+    "Em execução":"En ejecución",
+    "Aguardando retorno":"Esperando respuesta",
+    "Concluído":"Concluido",
+    "Arquivado":"Archivado",
+    // ---- Prioridades (exibição) ----
+    "Baixa":"Baja",
+    // ---- Tipos / categorias / destinos padrão (exibição) ----
+    "Economia de Água":"Ahorro de Agua",
+    "Relatório IA":"Reporte IA",
+    "Treinamento":"Capacitación",
+    "Suporte Técnico":"Soporte Técnico",
+    "Outros":"Otros",
+    "Pessoal":"Personal",
+    "Relatório":"Reporte",
+    "Reunião":"Reunión",
+    "Desenvolvimento":"Desarrollo",
+    "Rotina":"Rutina",
+    "Gerência Geral":"Gerencia General",
+    "Equipe Interna":"Equipo Interno",
+    // ---- Toasts / mensagens ----
+    "Demanda criada":"Demanda creada",
+    "Demanda atualizada":"Demanda actualizada",
+    "Demanda concluída":"Demanda concluida",
+    "Demanda arquivada 📦":"Demanda archivada 📦",
+    "Demanda reativada":"Demanda reactivada",
+    "Demanda excluída":"Demanda eliminada",
+    "Destaque removido":"Destacado eliminado",
+    "Perfil salvo":"Perfil guardado",
+    "Foto de perfil atualizada":"Foto de perfil actualizada",
+    "Configurações salvas":"Configuración guardada",
+    "Item já existe":"El elemento ya existe",
+    "Membro removido":"Miembro eliminado",
+    "Convite recusado":"Invitación rechazada",
+    "Você saiu da equipe":"Usted salió del equipo",
+    "Equipe e demandas excluídas":"Equipo y demandas eliminados",
+    "Atribuição aprovada — sua foto aparece no card ✔":"Asignación aprobada — su foto aparece en la tarjeta ✔",
+    "Atribuição recusada":"Asignación rechazada",
+    "Demanda aceita — agora aparece no seu pipeline ✔":"Demanda aceptada — ahora aparece en su pipeline ✔",
+    "Demanda dispensada do seu pipeline":"Demanda descartada de su pipeline",
+    "Você entrou na equipe ✔":"Usted entró al equipo ✔",
+    "Selecione uma imagem":"Seleccione una imagen",
+    "Imagem muito grande (máx. 5MB)":"Imagen demasiado grande (máx. 5MB)",
+    "Enviando foto...":"Enviando foto...",
+    "Foto atualizada ✔":"Foto actualizada ✔",
+    "Dê um nome à equipe":"Dele un nombre al equipo",
+    "Você já tem uma equipe com esse nome":"Usted ya tiene un equipo con ese nombre",
+    "Informe um e-mail válido":"Ingrese un correo válido",
+    "Esse e-mail já está na equipe":"Ese correo ya está en el equipo",
+    "Você não é membro desta equipe":"Usted no es miembro de este equipo",
+    "Informe a descrição":"Ingrese la descripción",
+    "Selecione o tipo da demanda":"Seleccione el tipo de demanda",
+    // ---- Mensagens de autenticação ----
+    "Preencha e-mail e senha.":"Complete correo y contraseña.",
+    "Preencha e-mail e senha do admin.":"Complete correo y contraseña del administrador.",
+    "Este e-mail não é administrador.":"Este correo no es administrador.",
+    "Informe seu nome.":"Ingrese su nombre.",
+    "Informe seu e-mail.":"Ingrese su correo.",
+    "Informe um telefone/WhatsApp válido (com DDD e número).":"Ingrese un teléfono/WhatsApp válido (con código de área y número).",
+    "A senha precisa ter ao menos 6 caracteres.":"La contraseña debe tener al menos 6 caracteres.",
+    "As senhas não coincidem.":"Las contraseñas no coinciden.",
+    "✓ As senhas coincidem":"✓ Las contraseñas coinciden",
+    "✗ As senhas não coincidem":"✗ Las contraseñas no coinciden",
+    "E-mail ou senha incorretos.":"Correo o contraseña incorrectos.",
+    "Este e-mail já tem conta. Faça login.":"Este correo ya tiene cuenta. Inicie sesión.",
+    "Muitas tentativas. Aguarde alguns segundos.":"Demasiados intentos. Espere unos segundos.",
+    "Conta criada! Aguarde a liberação do administrador para acessar.":"¡Cuenta creada! Espere la habilitación del administrador para acceder.",
+    "Conta criada! Confirme seu e-mail (se exigido) e aguarde a liberação do administrador.":"¡Cuenta creada! Confirme su correo (si es requerido) y espere la habilitación del administrador.",
+    "Sua conta ainda não foi liberada pelo administrador. Tente novamente mais tarde.":"Su cuenta aún no fue habilitada por el administrador. Intente nuevamente más tarde.",
+    "Informe um e-mail válido.":"Ingrese un correo válido.",
+    "Se houver uma conta com este e-mail, enviamos um link para redefinir a senha. Verifique a caixa de entrada e o spam.":"Si existe una cuenta con este correo, enviamos un enlace para restablecer la contraseña. Revise la bandeja de entrada y el spam.",
+    "Senha alterada com sucesso! Você já pode entrar com a nova senha.":"¡Contraseña cambiada con éxito! Ya puede ingresar con la nueva contraseña.",
+    "Senha redefinida. Entre com a sua nova senha.":"Contraseña restablecida. Ingrese con su nueva contraseña.",
+    "O link expirou ou já foi usado. Volte ao login e solicite um novo link.":"El enlace expiró o ya fue usado. Vuelva al inicio de sesión y solicite un nuevo enlace.",
+    // ---- Rótulos de botões "ocupado" ----
+    "Salvando...":"Guardando...",
+    "Entrando...":"Ingresando...",
+    "Criando...":"Creando...",
+    "Movendo...":"Moviendo...",
+    "Enviando...":"Enviando..."
+  }
+};
+// Trechos dinâmicos (com datas/números embutidos): substituição parcial.
+// Aplicados só quando NÃO há correspondência exata no dicionário.
+// Ordem importa (plural antes do singular).
+const I18N_SUB = {
+  es: [
+    ["Status alterado em","Estado actualizado el"],
+    ["movimentações","movimientos"],
+    ["movimentação","movimiento"],
+    ["em aberto","abiertos"],
+    ["em 2 dias","en 2 días"],
+    ["vence(m) nos próximos 2 dias","vencen en los próximos 2 días"],
+    ["Mover para:","Mover a:"],
+    ["Recorrência:","Recurrencia:"],
+    ["Será recriada automaticamente em","Se recreará automáticamente el"],
+    ["e a cada período seguinte, sempre na coluna Entrada.","y en cada período siguiente, siempre en la columna Entrada."],
+    ["demanda(s) recorrente(s) adicionada(s) na Entrada","demanda(s) recurrente(s) agregada(s) en Entrada"],
+    ["— digite o DDD/área e o número (sem o +","— ingrese el código de área y el número (sin el +"]
+  ]
+};
+
+let CURRENT_LANG = 'pt';
+let _i18nBusy = false;
+let _i18nObserver = null;
+const _i18nOrig = new WeakMap();      // nó de texto -> texto ORIGINAL (PT)
+const _i18nAttrOrig = new WeakMap();  // elemento -> {attr: valor original (PT)}
+
+// Traduz uma string PT->idioma. Devolve null se não há nada a traduzir.
+function _traduzStr(pt, lang){
+  if(lang==='pt') return null;
+  const dict = I18N[lang]; if(!dict) return null;
+  if(Object.prototype.hasOwnProperty.call(dict, pt)) return dict[pt];
+  // fallback por trechos (strings dinâmicas)
+  const subs = (I18N_SUB[lang]||[]);
+  let out = pt, changed = false;
+  for(const [from,to] of subs){
+    if(out.indexOf(from) !== -1){ out = out.split(from).join(to); changed = true; }
+  }
+  return changed ? out : null;
+}
+
+// Aplica tradução a um nó de texto (preserva espaços ao redor).
+function _traduzNoTexto(node, lang){
+  const base = _i18nOrig.has(node) ? _i18nOrig.get(node) : node.nodeValue;
+  if(!base) return;
+  const trimmed = base.trim();
+  if(!trimmed){ return; }
+  if(lang === 'pt'){
+    if(_i18nOrig.has(node) && node.nodeValue !== base) node.nodeValue = base;
+    return;
+  }
+  const tr = _traduzStr(trimmed, lang);
+  if(tr == null) return;                       // nada a traduzir
+  const lead = base.slice(0, base.length - base.replace(/^\s+/,'').length);
+  const trail = base.slice(base.replace(/\s+$/,'').length);
+  const novo = lead + tr + trail;
+  if(!_i18nOrig.has(node)) _i18nOrig.set(node, base);
+  if(node.nodeValue !== novo) node.nodeValue = novo;  // evita disparar o observer à toa
+}
+
+// Aplica tradução a um atributo (placeholder/title) de um elemento.
+function _traduzAttr(el, attr, lang){
+  if(!el.hasAttribute || !el.hasAttribute(attr)) return;
+  let store = _i18nAttrOrig.get(el);
+  if(lang === 'pt'){
+    if(store && store[attr] !== undefined && el.getAttribute(attr) !== store[attr]) el.setAttribute(attr, store[attr]);
+    return;
+  }
+  const base = (store && store[attr] !== undefined) ? store[attr] : el.getAttribute(attr);
+  const tr = _traduzStr((base||'').trim(), lang);
+  if(tr == null) return;
+  if(!store){ store = {}; _i18nAttrOrig.set(el, store); }
+  if(store[attr] === undefined) store[attr] = base;
+  if(el.getAttribute(attr) !== tr) el.setAttribute(attr, tr);
+}
+
+// Percorre uma subárvore e traduz texto + atributos (e fixa value dos <option>).
+function traduzArvore(root, lang){
+  if(!root) return;
+  // 1) Fixa o value ORIGINAL dos <option> sem value explícito (proteção do salvamento)
+  const fixaOption = o => { if(o && o.tagName==='OPTION' && !o.hasAttribute('value')) o.setAttribute('value', o.value); };
+  if(root.nodeType === 1 && root.tagName === 'OPTION') fixaOption(root);
+  if(root.querySelectorAll) root.querySelectorAll('option').forEach(fixaOption);
+  // 2) Atributos placeholder/title
+  const trataAttrs = el => { _traduzAttr(el,'placeholder',lang); _traduzAttr(el,'title',lang); };
+  if(root.nodeType === 1 && (root.hasAttribute('placeholder') || root.hasAttribute('title'))) trataAttrs(root);
+  if(root.querySelectorAll) root.querySelectorAll('[placeholder],[title]').forEach(trataAttrs);
+  // 3) Nós de texto
+  if(root.nodeType === 3){ _traduzNoTexto(root, lang); return; }
+  if(!root.querySelectorAll) return;
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+    acceptNode(n){
+      const p = n.parentNode; if(!p) return NodeFilter.FILTER_REJECT;
+      const tag = p.nodeName;
+      if(tag === 'SCRIPT' || tag === 'STYLE') return NodeFilter.FILTER_REJECT;
+      if(p.closest && p.closest('.lang-switch')) return NodeFilter.FILTER_REJECT; // não traduz os botões PT/ES
+      if(!n.nodeValue || !n.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
+      return NodeFilter.FILTER_ACCEPT;
+    }
+  });
+  const nodes = [];
+  while(walker.nextNode()) nodes.push(walker.currentNode);
+  nodes.forEach(n => _traduzNoTexto(n, lang));
+}
+
+// Observa o DOM e re-traduz conteúdo gerado dinamicamente (somente em ES).
+function _iniciarObserverI18N(){
+  if(_i18nObserver) return;
+  _i18nObserver = new MutationObserver(muts => {
+    if(CURRENT_LANG === 'pt' || _i18nBusy) return;
+    _i18nBusy = true;
+    try{
+      for(const mu of muts){
+        if(mu.type === 'childList'){
+          mu.addedNodes.forEach(n => {
+            if(n.nodeType === 1) traduzArvore(n, CURRENT_LANG);
+            else if(n.nodeType === 3) _traduzNoTexto(n, CURRENT_LANG);
+          });
+        }else if(mu.type === 'characterData'){
+          _traduzNoTexto(mu.target, CURRENT_LANG);
+        }
+      }
+    }finally{ _i18nBusy = false; }
+  });
+  _i18nObserver.observe(document.body, {childList:true, subtree:true, characterData:true});
+}
+
+// Troca o idioma da interface. Chamado pelos botões 🇧🇷 PT / 🇪🇸 ES.
+function setLang(lang){
+  if(lang !== 'pt' && lang !== 'es') lang = 'pt';
+  CURRENT_LANG = lang;
+  try{ localStorage.setItem('pdc_lang', lang); }catch(e){}
+  document.documentElement.lang = (lang === 'es') ? 'es-419' : 'pt-BR';
+  // estado visual dos botões (login / app / recuperação)
+  ['login','app','rec'].forEach(s => {
+    const pt = document.getElementById('lang-pt-'+s), es = document.getElementById('lang-es-'+s);
+    if(pt) pt.classList.toggle('active', lang === 'pt');
+    if(es) es.classList.toggle('active', lang === 'es');
+  });
+  _i18nBusy = true;
+  try{ traduzArvore(document.body, lang); }finally{ _i18nBusy = false; }
+  _iniciarObserverI18N();
+}
+
+// Detecta se a página foi aberta pelo link de redefinição de senha do Supabase.
+// O token vem no #hash (type=recovery) — em alguns casos também na query string.
+function _ehVoltaDeRecuperacao(){
+  const h=(window.location.hash||'')+' '+(window.location.search||'');
+  return /type=recovery/i.test(h);
+}
+
 (async function init(){
+  // aplica o idioma salvo (PT por padrão) antes de mostrar a interface
+  setLang(localStorage.getItem('pdc_lang') || 'pt');
+
   switchAuth('login');
   // Prepara o seletor de país (DDI) do cadastro, com Brasil como padrão
   preencherDDI('su-ddi','55');
   atualizarDicaTelefone('su');
-  try{
-    const{data:{session}}=await sb.auth.getSession();
-    if(session&&session.user){await iniciarApp(session.user);}
-  }catch(e){console.warn(e);}
-  // Mantém login após refresh / troca de aba
+
+  // Listener de auth registrado CEDO: o evento PASSWORD_RECOVERY pode chegar
+  // assim que o Supabase processa o token da URL.
   sb.auth.onAuthStateChange((event,session)=>{
+    if(event==='PASSWORD_RECOVERY'){
+      mostrarTelaNovaSenha();        // mostra a tela de nova senha (não entra no app)
+      return;
+    }
     if(event==='SIGNED_OUT'){
+      if(_recoveryMode) return;      // durante a recuperação, ignoramos o signOut interno
       document.getElementById('app').style.display='none';
       document.getElementById('login-screen').style.display='flex';
     }
   });
+
+  // Se voltou pelo link de recuperação, NÃO faz login automático:
+  // mostra a tela de nova senha (guarda anti auto-login).
+  if(_ehVoltaDeRecuperacao()){
+    _recoveryMode=true;
+    mostrarTelaNovaSenha();
+    return;
+  }
+
+  try{
+    const{data:{session}}=await sb.auth.getSession();
+    if(session&&session.user && !_recoveryMode){await iniciarApp(session.user);}
+  }catch(e){console.warn(e);}
 })();
 </script>
 </body>
