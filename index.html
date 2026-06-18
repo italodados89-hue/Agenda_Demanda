@@ -329,11 +329,11 @@ summary{cursor:pointer;padding:16px 18px;font-weight:900;color:var(--navy);backg
     </div>
     <div class="hero-img video-premium">
       <iframe class="drive-video"
-        src="https://drive.google.com/file/d/1X_NaW2mjIu2ippUzV-6f1vrNnslHQa0I/preview?autoplay=1&mute=1&loop=1"
+        src="https://drive.google.com/file/d/1X_NaW2mjIu2ippUzV-6f1vrNnslHQa0I/preview"
         title="Vídeo da Sala CMA Chesterton"
-        allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
+        allow="autoplay; fullscreen; picture-in-picture"
         allowfullscreen
-        loading="eager"></iframe>
+        loading="lazy"></iframe>
       <div class="img-caption">
         <b>Vídeo da Sala CMA Chesterton</b>
         <span>Ambiente em estruturação para monitoramento, contratos, sensores, IA, Power BI e suporte executivo à expansão Brasil/LATAM.</span>
@@ -478,9 +478,9 @@ summary{cursor:pointer;padding:16px 18px;font-weight:900;color:var(--navy);backg
     <div class="cma">
       <div class="cma-photo video-premium">
         <iframe class="drive-video"
-          src="https://drive.google.com/file/d/1X_NaW2mjIu2ippUzV-6f1vrNnslHQa0I/preview?autoplay=1&mute=1&loop=1"
+          src="https://drive.google.com/file/d/1X_NaW2mjIu2ippUzV-6f1vrNnslHQa0I/preview"
           title="Vídeo da Sala CMA Chesterton"
-          allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
+          allow="autoplay; fullscreen; picture-in-picture"
           allowfullscreen
           loading="lazy"></iframe>
         <div class="caption">
@@ -733,22 +733,7 @@ function updateSim() {
   ], {currency:true});
 }
 
-function enableDriveAutoplay(){
-  document.querySelectorAll('iframe.drive-video').forEach((frame, index)=>{
-    const url = new URL(frame.src);
-    url.searchParams.set('autoplay','1');
-    url.searchParams.set('mute','1');
-    url.searchParams.set('loop','1');
-    frame.src = url.toString();
-    frame.setAttribute('allow', 'autoplay; encrypted-media; fullscreen; picture-in-picture');
-    frame.setAttribute('allowfullscreen', '');
-    frame.setAttribute('referrerpolicy', 'no-referrer-when-downgrade');
-    frame.loading = index === 0 ? 'eager' : 'lazy';
-  });
-}
-
 function init() {
-  enableDriveAutoplay();
   renderKPIs();
   renderStages();
   renderTopOpps();
